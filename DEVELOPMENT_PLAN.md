@@ -36,7 +36,7 @@ Dependencias frontend base:
 - `@ant-design/nextjs-registry`.
 - Motion.dev mediante el paquete `motion`.
 
-La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`.
+La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible.
 
 ## 3. Stack y reglas no negociables
 
@@ -378,18 +378,19 @@ Comandos actualmente disponibles:
 npm install
 npm run dev:web
 npm run build:web
+npm run start:api
+npm run build:api
+npm run typecheck:api
+npm run prisma:validate
+npm run prisma:generate
+npm run prisma:migrate:dev
+npm run prisma:migrate:deploy
+npm run prisma:seed
 npx impeccable update
 npx impeccable detect <ruta>
 ```
 
-Cuando exista backend, agregar comandos concretos para:
-
-- Desarrollo de API.
-- Build de API.
-- Tests unitarios.
-- Tests de integracion.
-- Migraciones Prisma.
-- Seed de base de datos.
+Los comandos de tests unitarios y de integracion se agregaran junto con los modulos de dominio de las siguientes fases.
 
 Orden recomendado de CI una vez exista codigo:
 
