@@ -6,3 +6,149 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum MachineStatus {
+  ACTIVE
+  INACTIVE
+  UNDER_MAINTENANCE
+  RETIRED
+}
+
+enum MachineCriticality {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+  INSPECTION
+}
+
+enum MaintenanceResult {
+  OK
+  NEEDS_FOLLOW_UP
+  FAILED
+  CRITICAL_FAILURE
+}
+
+enum NotificationType {
+  PREVENTIVE_DUE_SOON
+  PREVENTIVE_OVERDUE
+  URGENT_CRITICAL_FAILURE
+}
+
+enum NotificationSeverity {
+  INFO
+  WARNING
+  URGENT
+  CRITICAL
+}
+
+enum NotificationStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+}
+
+model MachineCategory {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique @db.VarChar(100)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+  machines    Machine[]
+}
+
+model Machine {
+  id               String             @id @default(uuid()) @db.Uuid
+  categoryId       String             @db.Uuid
+  name             String             @db.VarChar(150)
+  serialNumber     String?            @unique @db.VarChar(100)
+  location         String             @db.VarChar(150)
+  manufacturer     String?            @db.VarChar(100)
+  model            String?            @db.VarChar(100)
+  status           MachineStatus      @default(ACTIVE)
+  criticality      MachineCriticality @default(MEDIUM)
+  installedAt      DateTime?          @db.Date
+  createdAt        DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime           @updatedAt @db.Timestamptz(3)
+
+  category         MachineCategory    @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlans MaintenancePlan[]
+  maintenanceLogs  MaintenanceLog[]
+  notifications    Notification[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([criticality])
+  @@index([location])
+}
+
+model MaintenancePlan {
+  id                String             @id @default(uuid()) @db.Uuid
+  machineId         String             @db.Uuid
+  name              String             @db.VarChar(150)
+  description       String?            @db.Text
+  frequencyDays     Int
+  warningDaysBefore Int                @default(7)
+  isActive          Boolean            @default(true)
+  startsAt          DateTime           @db.Date
+  lastComputedDueAt DateTime?          @db.Date
+  createdAt         DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime           @updatedAt @db.Timestamptz(3)
+
+  machine           Machine            @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenanceLogs   MaintenanceLog[]
+  notifications     Notification[]
+
+  @@index([machineId])
+  @@index([isActive, lastComputedDueAt])
+  @@index([startsAt])
+}
+
+model MaintenanceLog {
+  id                String            @id @default(uuid()) @db.Uuid
+  machineId         String            @db.Uuid
+  maintenancePlanId String?           @db.Uuid
+  performedAt       DateTime          @db.Timestamptz(3)
+  type              MaintenanceType
+  result            MaintenanceResult
+  notes             String?           @db.Text
+  performedBy       String            @db.VarChar(150)
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @db.Timestamptz(3)
+
+  machine           Machine           @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlan   MaintenancePlan?  @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([machineId, performedAt])
+  @@index([maintenancePlanId, performedAt])
+  @@index([type, result])
+}
+
+model Notification {
+  id                String               @id @default(uuid()) @db.Uuid
+  machineId         String               @db.Uuid
+  maintenancePlanId String?              @db.Uuid
+  type              NotificationType
+  severity          NotificationSeverity
+  status            NotificationStatus   @default(OPEN)
+  title             String               @db.VarChar(180)
+  message           String               @db.Text
+  dueAt             DateTime?             @db.Timestamptz(3)
+  resolvedAt        DateTime?             @db.Timestamptz(3)
+  createdAt         DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime              @updatedAt @db.Timestamptz(3)
+
+  machine           Machine              @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlan   MaintenancePlan?     @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([machineId, status])
+  @@index([maintenancePlanId, type, status])
+  @@index([status, severity])
+  @@index([dueAt])
+}

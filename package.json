@@ -11,6 +11,9 @@
     "build:api": "npm run build --workspace apps/api",
     "start:api": "npm run start:dev --workspace apps/api",
     "typecheck:api": "npm run typecheck --workspace apps/api",
+    "prisma:migrate:dev": "npm run prisma:migrate:dev --workspace apps/api",
+    "prisma:migrate:deploy": "npm run prisma:migrate:deploy --workspace apps/api",
+    "prisma:seed": "npm run prisma:seed --workspace apps/api",
     "prisma:generate": "npm run prisma:generate --workspace apps/api",
     "prisma:validate": "npm run prisma:validate --workspace apps/api"
   }
