@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+:root {
+  --ink: #17211f;
+  --muted: #68736f;
+  --paper: #f4f5f1;
+  --panel: #ffffff;
+  --line: #dfe4df;
+  --signal: #f2b84b;
+  --signal-soft: #fff4d8;
+  --critical: #d95b4f;
+  --critical-soft: #fff0ed;
+  --sage: #668875;
+  --sage-soft: #e8f1e9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background:
+    radial-gradient(circle at 80% -10%, rgba(242, 184, 75, 0.15), transparent 28rem),
+    var(--paper);
+  color: var(--ink);
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--ink);
+}
+
+.eyebrow {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
