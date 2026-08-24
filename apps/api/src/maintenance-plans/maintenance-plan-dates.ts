@@ -36,7 +36,7 @@ export function calculatePlanSchedule(
   return {
     nextDueAt,
     warningStartsAt,
-    isOverdue: now.getTime() > nextDueAt.getTime(),
-    isDueSoon: now.getTime() >= warningStartsAt.getTime() && now.getTime() <= nextDueAt.getTime(),
+    isOverdue: now.getTime() >= nextDueAt.getTime(),
+    isDueSoon: now.getTime() >= warningStartsAt.getTime() && now.getTime() < nextDueAt.getTime(),
   };
 }

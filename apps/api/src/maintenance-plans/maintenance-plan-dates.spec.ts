@@ -35,7 +35,7 @@ describe('maintenance plan dates', () => {
     };
 
     expect(calculatePlanSchedule(plan, new Date('2026-01-24T00:00:00.000Z')).isDueSoon).toBe(true);
-    expect(calculatePlanSchedule(plan, new Date('2026-01-31T00:00:00.000Z')).isDueSoon).toBe(true);
-    expect(calculatePlanSchedule(plan, new Date('2026-02-01T00:00:00.000Z')).isOverdue).toBe(true);
+    expect(calculatePlanSchedule(plan, new Date('2026-01-30T00:00:00.000Z')).isDueSoon).toBe(true);
+    expect(calculatePlanSchedule(plan, new Date('2026-01-31T00:00:00.000Z')).isOverdue).toBe(true);
   });
 });
