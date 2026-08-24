@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { CreateMachineDto } from './dto/create-machine.dto';
 import { ListMachinesDto } from './dto/list-machines.dto';
 import { UpdateMachineDto } from './dto/update-machine.dto';

@@ -9,10 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMaintenancePlanDto } from './dto/create-maintenance-plan.dto';
 import { ListMaintenancePlansDto } from './dto/list-maintenance-plans.dto';
 import { UpdateMaintenancePlanDto } from './dto/update-maintenance-plan.dto';
-import {
-  calculatePlanSchedule,
-  VALID_PREVENTIVE_RESULTS,
-} from './maintenance-plan-dates';
+import { calculatePlanSchedule, VALID_PREVENTIVE_RESULTS } from './maintenance-plan-dates';
 
 const planInclude = {
   machine: { include: { category: true } },
@@ -139,11 +136,7 @@ export class MaintenancePlansService {
   async activate(id: string) {
     const current = await this.findPlanRecord(id);
 
-    await this.ensureNoEquivalentActivePlan(
-      current.machineId,
-      current,
-      id,
-    );
+    await this.ensureNoEquivalentActivePlan(current.machineId, current, id);
 
     const plan = await this.prisma.maintenancePlan.update({
       where: { id },
@@ -222,7 +215,14 @@ export class MaintenancePlansService {
     return date;
   }
 
-  private withSchedule<T extends { startsAt: Date; frequencyDays: number; warningDaysBefore: number; maintenanceLogs?: Array<{ performedAt: Date }> }>(plan: T) {
+  private withSchedule<
+    T extends {
+      startsAt: Date;
+      frequencyDays: number;
+      warningDaysBefore: number;
+      maintenanceLogs?: Array<{ performedAt: Date }>;
+    },
+  >(plan: T) {
     return {
       ...plan,
       ...calculatePlanSchedule(plan),

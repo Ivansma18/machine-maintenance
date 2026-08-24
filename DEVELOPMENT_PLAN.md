@@ -36,7 +36,7 @@ Dependencias frontend base:
 - `@ant-design/nextjs-registry`.
 - Motion.dev mediante el paquete `motion`.
 
-La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible. La Fase 4 agrega el vertical backend de maquinas con CRUD, filtros y desactivacion segura. La Fase 5 agrega planes preventivos, calculo de vencimientos y activacion segura. La Fase 6 agrega el historial de mantenimientos y alertas urgentes para fallos criticos. La Fase 7 agrega el motor preventivo, bandeja de notificaciones, transiciones de estado y job horario.
+La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible. La Fase 4 agrega el vertical backend de maquinas con CRUD, filtros y desactivacion segura. La Fase 5 agrega planes preventivos, calculo de vencimientos y activacion segura. La Fase 6 agrega el historial de mantenimientos y alertas urgentes para fallos criticos. La Fase 7 agrega el motor preventivo, bandeja de notificaciones, transiciones de estado y job horario. La Fase 8 agrega el dashboard operativo conectado al resumen de la API.
 
 ## 3. Stack y reglas no negociables
 
@@ -128,6 +128,18 @@ apps/
 ```
 
 Cada modulo backend y cada feature frontend debe mantener sus componentes, servicios, tipos y pruebas cerca de su dominio. Evitar capas globales genericas como `controllers/`, `services/` o `repositories/`.
+
+### Convenciones de composicion frontend
+
+- Los entrypoints obligatorios de Next.js (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx` y `not-found.tsx`) solo conectan el router con componentes descriptivos.
+- Las paginas no contienen logica de negocio, acceso HTTP, estado complejo, helpers ni bloques extensos de UI.
+- Cada feature debe separar `components/`, `hooks/`, `api/`, `types.ts` y `utils/` cuando tenga mas de una responsabilidad.
+- Los componentes son presentacionales y reciben datos y callbacks mediante props.
+- Los hooks contienen estado, efectos, carga, errores, reintentos y acciones de la feature.
+- La capa `api/` contiene exclusivamente clientes HTTP y normalizacion de respuestas de la feature.
+- `utils/` contiene funciones puras y testeables, sin React ni acceso a infraestructura.
+- Usar nombres semanticos para componentes de pagina, como `OperationalDashboardPage`; conservar `page.tsx` solo por la convencion de Next.js.
+- Aplicar Clean Code y SOLID: responsabilidad unica, cohesion alta, bajo acoplamiento y dependencias explicitas.
 
 ## 5. Fase 1: Base frontend
 

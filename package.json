@@ -16,6 +16,11 @@
     "prisma:migrate:deploy": "npm run prisma:migrate:deploy --workspace apps/api",
     "prisma:seed": "npm run prisma:seed --workspace apps/api",
     "prisma:generate": "npm run prisma:generate --workspace apps/api",
-    "prisma:validate": "npm run prisma:validate --workspace apps/api"
+    "prisma:validate": "npm run prisma:validate --workspace apps/api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
   }
 }
