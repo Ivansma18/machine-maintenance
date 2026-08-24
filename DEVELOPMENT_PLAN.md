@@ -36,7 +36,7 @@ Dependencias frontend base:
 - `@ant-design/nextjs-registry`.
 - Motion.dev mediante el paquete `motion`.
 
-La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible. La Fase 4 agrega el vertical backend de maquinas con CRUD, filtros y desactivacion segura. La Fase 5 agrega planes preventivos, calculo de vencimientos y activacion segura. La Fase 6 agrega el historial de mantenimientos y alertas urgentes para fallos criticos. La Fase 7 agrega el motor preventivo, bandeja de notificaciones, transiciones de estado y job horario.
+La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible. La Fase 4 agrega el vertical backend de maquinas con CRUD, filtros y desactivacion segura. La Fase 5 agrega planes preventivos, calculo de vencimientos y activacion segura. La Fase 6 agrega el historial de mantenimientos y alertas urgentes para fallos criticos. La Fase 7 agrega el motor preventivo, bandeja de notificaciones, transiciones de estado y job horario. La Fase 8 agrega el dashboard operativo conectado al resumen de la API.
 
 ## 3. Stack y reglas no negociables
 
