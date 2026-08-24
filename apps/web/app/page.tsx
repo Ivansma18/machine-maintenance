@@ -1,5 +1,5 @@
-import { DashboardClient } from '@/features/dashboard/DashboardClient';
+import { OperationalDashboardPage } from '@/features/dashboard/OperationalDashboardPage';
 
-export default function HomePage() {
-  return <DashboardClient />;
+export default function Page() {
+  return <OperationalDashboardPage />;
 }

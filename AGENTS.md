@@ -22,6 +22,18 @@
 - Motion.dev solo se consume mediante wrappers y presets reutilizables en `apps/web/components/motion` y `apps/web/lib/motion`.
 - Impeccable es la skill responsable del criterio visual de cada nueva feature frontend; debe respetar los wrappers y el sistema existente.
 
+## Convenciones de frontend
+
+- Los archivos reservados por Next.js (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx` y `not-found.tsx`) mantienen sus nombres obligatorios y funcionan como entrypoints del router.
+- Un `page.tsx` solo compone una pagina descriptiva de feature; no contiene `fetch`, logica de negocio, estado complejo, helpers ni markup extenso.
+- Cada feature frontend se organiza por responsabilidad: `components/` para UI, `hooks/` para estado y efectos, `api/` para acceso HTTP, `types.ts` para contratos y `utils/` para transformaciones puras.
+- Las paginas descriptivas deben usar nombres semanticos, por ejemplo `OperationalDashboardPage`, `MachinesPage` o `MaintenancePlansPage`.
+- Los componentes reciben datos por props y comunican acciones mediante callbacks; no conocen la infraestructura HTTP.
+- Los hooks encapsulan carga, error, retry, refresh y acciones de la feature; no renderizan UI.
+- Aplicar Clean Code y SOLID: responsabilidad unica, dependencias explicitas, bajo acoplamiento y funciones pequenas.
+- Si un archivo mezcla layout, datos, estados y transformaciones, debe dividirse antes de crecer.
+- Las features no importan directamente `antd`, `@ant-design/icons`, `motion/react` ni `motion/react-m`; usan wrappers propios.
+
 ## Restricciones para futuras sesiones
 
 - Mantener cambios pequenos y verificables; no introducir ERP/CRM antes de cubrir el alcance actual.
