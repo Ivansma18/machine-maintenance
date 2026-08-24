@@ -17,7 +17,10 @@ export class NotificationsScheduler {
       const result = await this.notificationsService.processPreventiveNotifications();
       this.logger.log(`Preventive notifications processed: ${JSON.stringify(result)}`);
     } catch (error) {
-      this.logger.error('Preventive notification job failed', error instanceof Error ? error.stack : String(error));
+      this.logger.error(
+        'Preventive notification job failed',
+        error instanceof Error ? error.stack : String(error),
+      );
     }
   }
 }

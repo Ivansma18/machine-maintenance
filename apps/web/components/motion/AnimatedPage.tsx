@@ -8,12 +8,7 @@ import { fadeUp } from '@/lib/motion/presets';
 
 export function AnimatedPage({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <m.main
-      animate="visible"
-      className="min-h-screen"
-      initial="hidden"
-      variants={fadeUp}
-    >
+    <m.main animate="visible" className="min-h-screen" initial="hidden" variants={fadeUp}>
       {children}
     </m.main>
   );

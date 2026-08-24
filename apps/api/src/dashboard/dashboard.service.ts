@@ -6,7 +6,10 @@ import {
   NotificationStatus,
   Prisma,
 } from '../generated/prisma/client';
-import { calculatePlanSchedule, VALID_PREVENTIVE_RESULTS } from '../maintenance-plans/maintenance-plan-dates';
+import {
+  calculatePlanSchedule,
+  VALID_PREVENTIVE_RESULTS,
+} from '../maintenance-plans/maintenance-plan-dates';
 import { PrismaService } from '../prisma/prisma.service';
 
 const planInclude = {
@@ -27,7 +30,16 @@ export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getSummary(now = new Date()) {
-    const [totalMachines, activeMachines, underMaintenanceMachines, inactiveMachines, retiredMachines, activePlans, urgentNotifications, recentLogs] = await this.prisma.$transaction([
+    const [
+      totalMachines,
+      activeMachines,
+      underMaintenanceMachines,
+      inactiveMachines,
+      retiredMachines,
+      activePlans,
+      urgentNotifications,
+      recentLogs,
+    ] = await this.prisma.$transaction([
       this.prisma.machine.count(),
       this.prisma.machine.count({ where: { status: MachineStatus.ACTIVE } }),
       this.prisma.machine.count({ where: { status: MachineStatus.UNDER_MAINTENANCE } }),
@@ -53,7 +65,9 @@ export class DashboardService {
       }),
     ]);
 
-    const upcoming = activePlans.filter((plan) => calculatePlanSchedule(plan, now).isDueSoon).length;
+    const upcoming = activePlans.filter(
+      (plan) => calculatePlanSchedule(plan, now).isDueSoon,
+    ).length;
     const overdue = activePlans.filter((plan) => calculatePlanSchedule(plan, now).isOverdue).length;
 
     return {

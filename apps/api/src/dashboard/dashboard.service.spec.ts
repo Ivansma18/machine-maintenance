@@ -36,7 +36,13 @@ describe('DashboardService', () => {
 
     const summary = await service.getSummary(new Date('2026-01-25T00:00:00.000Z'));
 
-    expect(summary.machines).toEqual({ total: 12, active: 8, underMaintenance: 2, inactive: 1, retired: 1 });
+    expect(summary.machines).toEqual({
+      total: 12,
+      active: 8,
+      underMaintenance: 2,
+      inactive: 1,
+      retired: 1,
+    });
     expect(summary.maintenance).toEqual({ dueSoon: 1, overdue: 0 });
     expect(summary.openUrgentNotifications).toBe(3);
     expect(summary.recentLogs).toEqual([]);

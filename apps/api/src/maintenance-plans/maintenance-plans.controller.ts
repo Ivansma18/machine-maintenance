@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { CreateMaintenancePlanDto } from './dto/create-maintenance-plan.dto';
 import { ListMaintenancePlansDto } from './dto/list-maintenance-plans.dto';
 import { UpdateMaintenancePlanDto } from './dto/update-maintenance-plan.dto';

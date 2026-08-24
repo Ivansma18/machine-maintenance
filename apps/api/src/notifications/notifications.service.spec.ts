@@ -46,7 +46,9 @@ describe('NotificationsService', () => {
     prisma.notification.findMany.mockResolvedValue([]);
     prisma.notification.create.mockResolvedValue({ id: 'notification-id' });
 
-    const result = await service.processPreventiveNotifications(new Date('2026-01-25T00:00:00.000Z'));
+    const result = await service.processPreventiveNotifications(
+      new Date('2026-01-25T00:00:00.000Z'),
+    );
 
     expect(result).toEqual({ processedPlans: 1, created: 1, updated: 0, resolved: 0 });
     expect(prisma.notification.create).toHaveBeenCalledWith(
@@ -68,7 +70,9 @@ describe('NotificationsService', () => {
       { id: 'notification-id', type: NotificationType.PREVENTIVE_OVERDUE },
     ]);
 
-    const result = await service.processPreventiveNotifications(new Date('2026-02-01T00:00:00.000Z'));
+    const result = await service.processPreventiveNotifications(
+      new Date('2026-02-01T00:00:00.000Z'),
+    );
 
     expect(result).toEqual({ processedPlans: 1, created: 0, updated: 1, resolved: 0 });
     expect(prisma.notification.update).toHaveBeenCalledWith(
@@ -93,7 +97,9 @@ describe('NotificationsService', () => {
       },
     ]);
 
-    const result = await service.processPreventiveNotifications(new Date('2026-02-01T00:00:00.000Z'));
+    const result = await service.processPreventiveNotifications(
+      new Date('2026-02-01T00:00:00.000Z'),
+    );
 
     expect(result.updated).toBe(0);
     expect(prisma.notification.update).not.toHaveBeenCalled();
@@ -106,7 +112,9 @@ describe('NotificationsService', () => {
     ]);
     prisma.notification.updateMany.mockResolvedValue({ count: 1 });
 
-    const result = await service.processPreventiveNotifications(new Date('2026-01-10T00:00:00.000Z'));
+    const result = await service.processPreventiveNotifications(
+      new Date('2026-01-10T00:00:00.000Z'),
+    );
 
     expect(result.resolved).toBe(1);
     expect(prisma.notification.updateMany).toHaveBeenCalled();

@@ -4,10 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  MachineStatus,
-  Prisma,
-} from '../generated/prisma/client';
+import { MachineStatus, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMachineDto } from './dto/create-machine.dto';
 import { ListMachinesDto } from './dto/list-machines.dto';

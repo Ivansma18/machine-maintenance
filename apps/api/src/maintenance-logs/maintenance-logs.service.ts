@@ -43,7 +43,9 @@ export class MaintenanceLogsService {
         }
 
         if (plan.machineId !== dto.machineId) {
-          throw new BadRequestException('The maintenance plan does not belong to the selected machine');
+          throw new BadRequestException(
+            'The maintenance plan does not belong to the selected machine',
+          );
         }
       }
 

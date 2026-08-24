@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   MachineCriticality,
   MaintenanceResult,
@@ -103,10 +99,7 @@ export class NotificationsService {
             machineId: plan.machine.id,
             maintenancePlanId: plan.id,
             type: {
-              in: [
-                NotificationType.PREVENTIVE_DUE_SOON,
-                NotificationType.PREVENTIVE_OVERDUE,
-              ],
+              in: [NotificationType.PREVENTIVE_DUE_SOON, NotificationType.PREVENTIVE_OVERDUE],
             },
             status: NotificationStatus.OPEN,
           },
@@ -117,7 +110,9 @@ export class NotificationsService {
         let resolved = 0;
 
         if (current) {
-          const existing = openNotifications.find((notification) => notification.type === current.type);
+          const existing = openNotifications.find(
+            (notification) => notification.type === current.type,
+          );
 
           if (existing) {
             const dueAtChanged = existing.dueAt?.getTime() !== schedule.nextDueAt.getTime();
@@ -211,16 +206,19 @@ export class NotificationsService {
     }
 
     if (!allowed.includes(notification.status)) {
-      throw new ConflictException(`Notification cannot transition from ${notification.status} to ${status}`);
+      throw new ConflictException(
+        `Notification cannot transition from ${notification.status} to ${status}`,
+      );
     }
 
     return this.prisma.notification.update({
       where: { id },
       data: {
         status,
-        resolvedAt: status === NotificationStatus.RESOLVED || status === NotificationStatus.DISMISSED
-          ? new Date()
-          : undefined,
+        resolvedAt:
+          status === NotificationStatus.RESOLVED || status === NotificationStatus.DISMISSED
+            ? new Date()
+            : undefined,
       },
       include: notificationInclude,
     });
@@ -233,9 +231,10 @@ export class NotificationsService {
     if (schedule.isOverdue) {
       return {
         type: NotificationType.PREVENTIVE_OVERDUE,
-        severity: criticality === MachineCriticality.CRITICAL
-          ? NotificationSeverity.CRITICAL
-          : NotificationSeverity.URGENT,
+        severity:
+          criticality === MachineCriticality.CRITICAL
+            ? NotificationSeverity.CRITICAL
+            : NotificationSeverity.URGENT,
         title: 'Preventive maintenance overdue',
         message: 'The preventive maintenance plan has exceeded its due date.',
       };

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { AnimatedCard } from "@/components/motion/AnimatedCard";
-import { AnimatedList } from "@/components/motion/AnimatedList";
-import { AnimatedListItem } from "@/components/motion/AnimatedListItem";
-import { AnimatedPage } from "@/components/motion/AnimatedPage";
-import { AnimatedSection } from "@/components/motion/AnimatedSection";
-import { AppButton } from "@/components/ui/AppButton";
-import { AppPanel } from "@/components/ui/AppPanel";
-import { AppTag } from "@/components/ui/AppTag";
+import { AnimatedCard } from '@/components/motion/AnimatedCard';
+import { AnimatedList } from '@/components/motion/AnimatedList';
+import { AnimatedListItem } from '@/components/motion/AnimatedListItem';
+import { AnimatedPage } from '@/components/motion/AnimatedPage';
+import { AnimatedSection } from '@/components/motion/AnimatedSection';
+import { AppButton } from '@/components/ui/AppButton';
+import { AppPanel } from '@/components/ui/AppPanel';
+import { AppTag } from '@/components/ui/AppTag';
 
 type DashboardSummary = {
   generatedAt: string;
@@ -30,35 +30,32 @@ type DashboardSummary = {
     machine: { id: string; name: string };
     maintenancePlan: { id: string; name: string } | null;
     performedAt: string;
-    type: "PREVENTIVE" | "CORRECTIVE" | "INSPECTION";
-    result: "OK" | "NEEDS_FOLLOW_UP" | "FAILED" | "CRITICAL_FAILURE";
+    type: 'PREVENTIVE' | 'CORRECTIVE' | 'INSPECTION';
+    result: 'OK' | 'NEEDS_FOLLOW_UP' | 'FAILED' | 'CRITICAL_FAILURE';
     performedBy: string;
   }>;
 };
 
-const apiUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/dashboard/summary`;
-const processUrl = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/notifications/process-preventive`;
+const apiUrl = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/api/dashboard/summary`;
+const processUrl = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/api/notifications/process-preventive`;
 
 const formatDate = (value: string) =>
-  new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(new Date(value));
 
-const resultTone = (
-  result: DashboardSummary["recentLogs"][number]["result"],
-) => {
-  if (result === "CRITICAL_FAILURE") return "critical" as const;
-  if (result === "FAILED") return "warning" as const;
-  if (result === "OK") return "success" as const;
-  return "neutral" as const;
+const resultTone = (result: DashboardSummary['recentLogs'][number]['result']) => {
+  if (result === 'CRITICAL_FAILURE') return 'critical' as const;
+  if (result === 'FAILED') return 'warning' as const;
+  if (result === 'OK') return 'success' as const;
+  return 'neutral' as const;
 };
 
-const resultLabel = (
-  result: DashboardSummary["recentLogs"][number]["result"],
-) => result.replaceAll("_", " ").toLowerCase();
+const resultLabel = (result: DashboardSummary['recentLogs'][number]['result']) =>
+  result.replaceAll('_', ' ').toLowerCase();
 
 export function DashboardClient() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -77,21 +74,15 @@ export function DashboardClient() {
       try {
         const response = await fetch(apiUrl, {
           signal: controller.signal,
-          cache: "no-store",
+          cache: 'no-store',
         });
         if (!response.ok)
-          throw new Error(
-            `Dashboard request failed with status ${response.status}`,
-          );
+          throw new Error(`Dashboard request failed with status ${response.status}`);
         setSummary((await response.json()) as DashboardSummary);
       } catch (requestError) {
-        if (
-          requestError instanceof DOMException &&
-          requestError.name === "AbortError"
-        )
-          return;
+        if (requestError instanceof DOMException && requestError.name === 'AbortError') return;
         setError(
-          "We could not connect to the operations API. Check that the backend is running and try again.",
+          'We could not connect to the operations API. Check that the backend is running and try again.',
         );
       } finally {
         if (!controller.signal.aborted) {
@@ -108,11 +99,11 @@ export function DashboardClient() {
   async function runAlertScan() {
     setRefreshing(true);
     try {
-      const response = await fetch(processUrl, { method: "POST" });
-      if (!response.ok) throw new Error("Alert scan failed");
+      const response = await fetch(processUrl, { method: 'POST' });
+      if (!response.ok) throw new Error('Alert scan failed');
       setRefreshKey((value) => value + 1);
     } catch {
-      setError("The alert scan could not be completed. Try again in a moment.");
+      setError('The alert scan could not be completed. Try again in a moment.');
       setRefreshing(false);
     }
   }
@@ -126,19 +117,14 @@ export function DashboardClient() {
               P
             </div>
             <div>
-              <p className="m-0 text-sm font-black tracking-[0.18em] text-[#17211f]">
-                PANTRY
-              </p>
+              <p className="m-0 text-sm font-black tracking-[0.18em] text-[#17211f]">PANTRY</p>
               <p className="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#68736f]">
                 Maintenance OS
               </p>
             </div>
           </div>
 
-          <nav
-            className="flex flex-1 flex-col gap-2"
-            aria-label="Main navigation"
-          >
+          <nav className="flex flex-1 flex-col gap-2" aria-label="Main navigation">
             <p className="eyebrow mb-2 px-3">Workspace</p>
             <a
               className="rounded-lg bg-[#17211f] px-3 py-2.5 text-sm font-bold text-white"
@@ -168,12 +154,9 @@ export function DashboardClient() {
 
           <div className="rounded-xl border border-[#dfe4df] bg-white p-4">
             <p className="eyebrow">System pulse</p>
-            <p className="mb-3 mt-2 text-sm font-bold text-[#17211f]">
-              Operations connected
-            </p>
+            <p className="mb-3 mt-2 text-sm font-bold text-[#17211f]">Operations connected</p>
             <div className="flex items-center gap-2 text-xs text-[#68736f]">
-              <span className="h-2 w-2 rounded-full bg-[#668875]" /> Live API
-              summary
+              <span className="h-2 w-2 rounded-full bg-[#668875]" /> Live API summary
             </div>
           </div>
         </aside>
@@ -188,12 +171,8 @@ export function DashboardClient() {
             </div>
             <div className="flex items-center gap-3">
               <div className="hidden text-right sm:block">
-                <p className="m-0 text-sm font-bold text-[#17211f]">
-                  Operations
-                </p>
-                <p className="m-0 text-xs text-[#68736f]">
-                  Live maintenance view
-                </p>
+                <p className="m-0 text-sm font-bold text-[#17211f]">Operations</p>
+                <p className="m-0 text-xs text-[#68736f]">Live maintenance view</p>
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9e7db] text-xs font-black text-[#365441]">
                 OP
@@ -201,10 +180,7 @@ export function DashboardClient() {
             </div>
           </header>
 
-          <main
-            className="px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-12"
-            id="overview"
-          >
+          <main className="px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-12" id="overview">
             <AnimatedSection className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div>
                 <p className="eyebrow">Operational pulse</p>
@@ -212,11 +188,7 @@ export function DashboardClient() {
                   See what needs attention before the next bakery shift starts.
                 </p>
               </div>
-              <AppButton
-                loading={refreshing}
-                variant="primary"
-                onClick={runAlertScan}
-              >
+              <AppButton loading={refreshing} variant="primary" onClick={runAlertScan}>
                 Run alert scan
               </AppButton>
             </AnimatedSection>
@@ -227,17 +199,10 @@ export function DashboardClient() {
                 role="alert"
               >
                 <div>
-                  <p className="m-0 text-sm font-bold text-[#8e2f28]">
-                    Dashboard unavailable
-                  </p>
-                  <p className="m-0 mt-1 text-xs leading-5 text-[#a65a52]">
-                    {error}
-                  </p>
+                  <p className="m-0 text-sm font-bold text-[#8e2f28]">Dashboard unavailable</p>
+                  <p className="m-0 mt-1 text-xs leading-5 text-[#a65a52]">{error}</p>
                 </div>
-                <AppButton
-                  variant="secondary"
-                  onClick={() => setRefreshKey((value) => value + 1)}
-                >
+                <AppButton variant="secondary" onClick={() => setRefreshKey((value) => value + 1)}>
                   Retry
                 </AppButton>
               </div>
@@ -260,22 +225,19 @@ export function DashboardClient() {
 function DashboardContent({ summary }: { summary: DashboardSummary }) {
   const total = Math.max(summary.machines.total, 1);
   const distribution = [
-    { label: "Active", count: summary.machines.active, color: "#668875" },
+    { label: 'Active', count: summary.machines.active, color: '#668875' },
     {
-      label: "Under maintenance",
+      label: 'Under maintenance',
       count: summary.machines.underMaintenance,
-      color: "#d95b4f",
+      color: '#d95b4f',
     },
-    { label: "Inactive", count: summary.machines.inactive, color: "#9da7a2" },
-    { label: "Retired", count: summary.machines.retired, color: "#c8cfca" },
+    { label: 'Inactive', count: summary.machines.inactive, color: '#9da7a2' },
+    { label: 'Retired', count: summary.machines.retired, color: '#c8cfca' },
   ];
 
   return (
     <>
-      <AnimatedSection
-        className="mb-5 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]"
-        delay={0.05}
-      >
+      <AnimatedSection className="mb-5 grid gap-5 xl:grid-cols-[1.35fr_0.65fr]" delay={0.05}>
         <AppPanel
           className="overflow-hidden"
           title="Machine health"
@@ -293,13 +255,10 @@ function DashboardContent({ summary }: { summary: DashboardSummary }) {
                 <p className="tabular-nums mb-1 mt-4 text-6xl font-black tracking-[-0.08em] text-[#17211f]">
                   {summary.machines.active}
                 </p>
-                <p className="m-0 text-sm text-[#68736f]">
-                  active machines on the floor
-                </p>
+                <p className="m-0 text-sm text-[#68736f]">active machines on the floor</p>
               </div>
               <p className="mb-0 mt-8 text-xs font-semibold text-[#668875]">
-                {summary.machines.underMaintenance} currently receiving
-                attention
+                {summary.machines.underMaintenance} currently receiving attention
               </p>
             </div>
             <div className="flex flex-col justify-center">
@@ -331,9 +290,7 @@ function DashboardContent({ summary }: { summary: DashboardSummary }) {
                       />
                       {status.label}
                     </span>
-                    <span className="tabular-nums font-bold text-[#17211f]">
-                      {status.count}
-                    </span>
+                    <span className="tabular-nums font-bold text-[#17211f]">{status.count}</span>
                   </div>
                 ))}
               </div>
@@ -341,38 +298,27 @@ function DashboardContent({ summary }: { summary: DashboardSummary }) {
           </div>
         </AppPanel>
 
-        <AppPanel
-          className="border-[#d95b4f]"
-          title="Urgent lane"
-          eyebrow="Requires attention"
-        >
+        <AppPanel className="border-[#d95b4f]" title="Urgent lane" eyebrow="Requires attention">
           <div className="flex h-full min-h-[220px] flex-col justify-between bg-[#fff7f5] p-6">
             <div>
               <p className="m-0 text-5xl font-black tracking-[-0.08em] text-[#d95b4f]">
                 {summary.openUrgentNotifications}
               </p>
-              <p className="mt-2 text-sm font-bold text-[#8e2f28]">
-                open urgent alerts
-              </p>
+              <p className="mt-2 text-sm font-bold text-[#8e2f28]">open urgent alerts</p>
             </div>
             <div className="mt-8 flex items-center justify-between gap-3">
               <span className="text-xs leading-5 text-[#a65a52]">
                 Critical issues stay visible until resolved.
               </span>
-              <AppTag
-                tone={summary.openUrgentNotifications ? "critical" : "success"}
-              >
-                {summary.openUrgentNotifications ? "Action needed" : "Clear"}
+              <AppTag tone={summary.openUrgentNotifications ? 'critical' : 'success'}>
+                {summary.openUrgentNotifications ? 'Action needed' : 'Clear'}
               </AppTag>
             </div>
           </div>
         </AppPanel>
       </AnimatedSection>
 
-      <AnimatedSection
-        className="mb-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
-        delay={0.1}
-      >
+      <AnimatedSection className="mb-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4" delay={0.1}>
         <Metric
           label="Active machines"
           value={summary.machines.active}
@@ -408,9 +354,7 @@ function DashboardContent({ summary }: { summary: DashboardSummary }) {
                 <p className="tabular-nums mb-1 mt-3 text-4xl font-black tracking-[-0.06em] text-[#a56c14]">
                   {summary.maintenance.dueSoon}
                 </p>
-                <p className="m-0 text-xs text-[#68736f]">
-                  within warning window
-                </p>
+                <p className="m-0 text-xs text-[#68736f]">within warning window</p>
               </div>
               <div className="pl-6">
                 <p className="eyebrow">Overdue</p>
@@ -437,14 +381,11 @@ function DashboardContent({ summary }: { summary: DashboardSummary }) {
                           {log.machine.name}
                         </p>
                         <p className="m-0 mt-1 truncate text-xs text-[#68736f]">
-                          {log.maintenancePlan?.name ??
-                            `${log.type.toLowerCase()} maintenance`}{" "}
-                          · {formatDate(log.performedAt)}
+                          {log.maintenancePlan?.name ?? `${log.type.toLowerCase()} maintenance`} ·{' '}
+                          {formatDate(log.performedAt)}
                         </p>
                       </div>
-                      <AppTag tone={resultTone(log.result)}>
-                        {resultLabel(log.result)}
-                      </AppTag>
+                      <AppTag tone={resultTone(log.result)}>{resultLabel(log.result)}</AppTag>
                     </AnimatedListItem>
                   ))
                 ) : (
@@ -470,22 +411,20 @@ function Metric({
   label: string;
   value: number;
   detail: string;
-  tone: "ink" | "warning" | "critical" | "sage";
+  tone: 'ink' | 'warning' | 'critical' | 'sage';
 }) {
   const color =
-    tone === "critical"
-      ? "text-[#d95b4f]"
-      : tone === "warning"
-        ? "text-[#a56c14]"
-        : tone === "sage"
-          ? "text-[#668875]"
-          : "text-[#17211f]";
+    tone === 'critical'
+      ? 'text-[#d95b4f]'
+      : tone === 'warning'
+        ? 'text-[#a56c14]'
+        : tone === 'sage'
+          ? 'text-[#668875]'
+          : 'text-[#17211f]';
   return (
     <AnimatedCard className="rounded-2xl border border-[#dfe4df] bg-white p-5">
       <p className="eyebrow">{label}</p>
-      <p
-        className={`tabular-nums mb-2 mt-4 text-4xl font-black tracking-[-0.06em] ${color}`}
-      >
+      <p className={`tabular-nums mb-2 mt-4 text-4xl font-black tracking-[-0.06em] ${color}`}>
         {value}
       </p>
       <p className="m-0 text-xs font-semibold text-[#68736f]">{detail}</p>
@@ -509,12 +448,10 @@ function DashboardSkeleton() {
 function EmptyDashboard() {
   return (
     <div className="rounded-2xl border border-dashed border-[#bfc9c1] bg-white p-10 text-center">
-      <p className="m-0 text-lg font-black text-[#17211f]">
-        No operational data yet
-      </p>
+      <p className="m-0 text-lg font-black text-[#17211f]">No operational data yet</p>
       <p className="mx-auto mb-0 mt-2 max-w-md text-sm leading-6 text-[#68736f]">
-        Add machines and maintenance plans to turn this room into a live view of
-        the production floor.
+        Add machines and maintenance plans to turn this room into a live view of the production
+        floor.
       </p>
     </div>
   );
