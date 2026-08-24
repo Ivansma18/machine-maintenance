@@ -11,7 +11,8 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
     "prisma:validate": "prisma validate",
-    "prisma:format": "prisma format"
+    "prisma:format": "prisma format",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.1",
@@ -32,10 +33,13 @@
     "@nestjs/cli": "^11.0.16",
     "@nestjs/schematics": "^11.0.7",
     "@nestjs/testing": "^11.1.6",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
+    "jest": "^30.0.5",
     "prisma": "^7.9.1",
     "ts-node": "^10.9.2",
+    "ts-jest": "^29.4.5",
     "tsx": "^4.20.3",
     "typescript": "^5.9.3"
   }
