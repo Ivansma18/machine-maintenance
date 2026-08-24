@@ -16,7 +16,7 @@ No se implementaran ventas, clientes, facturacion, inventario ni otros modulos E
 
 ## 2. Estado actual
 
-El repositorio se encuentra en preparacion de las siguientes fases; la Fase 1 frontend ya fue implementada y verificada.
+El repositorio se encuentra en preparacion de las siguientes fases; la Fase 1 frontend y la base de la Fase 2 backend ya fueron implementadas y verificadas.
 
 Ya esta definido:
 
@@ -36,7 +36,7 @@ Dependencias frontend base:
 - `@ant-design/nextjs-registry`.
 - Motion.dev mediante el paquete `motion`.
 
-Aun no existe codigo funcional de NestJS ni Prisma. La app Next.js base de la Fase 1 ya existe en `apps/web`.
+La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`.
 
 ## 3. Stack y reglas no negociables
 

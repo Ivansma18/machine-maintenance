@@ -22,7 +22,9 @@
 ## Restricciones para futuras sesiones
 - Mantener cambios pequenos y verificables; no introducir ERP/CRM antes de cubrir el alcance actual.
 - Preservar nombres de dominio en ingles para codigo (`Machine`, `MaintenancePlan`, `MaintenanceLog`, `Notification`) aunque la documentacion pueda estar en espanol.
-- Comandos actuales: `npm install`, `npm run dev:web`, `npm run build:web`.
+- Comandos actuales: `npm install`, `npm run dev:web`, `npm run build:web`, `npm run start:api`, `npm run build:api`, `npm run typecheck:api`.
+- Prisma API: copiar `apps/api/.env.example` a `apps/api/.env`, configurar `DATABASE_URL` y crear la base de datos manualmente antes de iniciar la API.
+- Despues ejecutar `npm run prisma:generate` y `npm run prisma:validate`.
 - Impeccable esta instalado a nivel de proyecto en `.opencode/skills/impeccable`; usar `/impeccable init` al iniciar el contexto visual.
 - Para actualizar Impeccable usar `npx impeccable update`; para auditar UI usar `npx impeccable detect <ruta>`.
 - No importar directamente `antd`, `@ant-design/icons`, `motion/react` o `motion/react-m` desde features de dominio.
