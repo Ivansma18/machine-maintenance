@@ -563,7 +563,168 @@ Dejar documentados los puntos de integracion y permisos necesarios para una futu
 - Las decisiones de roles, permisos, identidad, auditoria y puntos de integracion estan documentadas en `docs/auth-roles-readiness.md`.
 - El MVP permanece sin control de acceso ejecutable hasta aprobar la arquitectura de Auth/Roles.
 
-## 19. Orden de trabajo por feature
+## 19. Fase 15: Diseno tecnico final de Auth/Roles
+
+### Objetivo
+
+Convertir las decisiones de preparacion en un contrato tecnico implementable sin introducir todavia codigo de autenticacion.
+
+### Entregables
+
+- Confirmar login con `email` o `username` mas password.
+- Confirmar permisos globales y usuarios con multiples roles.
+- Definir modelos `User`, `Role`, `Permission`, `UserRole`, `RolePermission` y `Session`.
+- Definir cookie `HttpOnly`, `SameSite=Lax`, `Secure` en produccion y `Path=/`.
+- Definir expiracion por inactividad de siete dias usando `lastSeenAt` y `expiresAt`.
+- Definir sesiones multiples y revocacion individual por sesion.
+- Definir contratos `POST /api/auth/login`, `POST /api/auth/logout` y `GET /api/auth/me`.
+- Definir variables de seed del admin inicial.
+
+### Criterios de aceptacion
+
+- El contrato no depende de un proveedor externo concreto.
+- El diseño permite agregar OIDC, scopes por planta y cuentas de servicio despues.
+- No se implementan login, sesiones ni permisos ejecutables en esta fase.
+
+## 20. Fase 16: Prisma Auth Schema y Seed
+
+### Objetivo
+
+Crear la persistencia de usuarios, roles, permisos y sesiones.
+
+### Entregables
+
+- Agregar modelos Prisma de Auth/Roles y relaciones muchos-a-muchos.
+- Agregar `Session` con hash de token, `lastSeenAt`, `expiresAt` y `revokedAt`.
+- Crear migracion e indices para email, username, sesiones y relaciones.
+- Crear seed repetible de permisos y roles base.
+- Crear admin inicial desde `ADMIN_USERNAME`, `ADMIN_EMAIL`, `ADMIN_NAME` y `ADMIN_PASSWORD`.
+- Actualizar `.env.example` sin versionar credenciales reales.
+
+### Criterios de aceptacion
+
+- Passwords almacenadas unicamente como hashes.
+- El seed falla explicitamente si faltan variables obligatorias del admin.
+- `prisma:generate`, `prisma:validate` y las pruebas existentes pasan.
+
+## 21. Fase 17: Backend Auth
+
+### Objetivo
+
+Implementar autenticacion local y sesiones seguras por cookie.
+
+### Entregables
+
+- Crear modulo `auth` con hashing, login, logout y consulta de sesion.
+- Aceptar email o username como `identifier` en login.
+- Crear una sesion nueva por login y permitir multiples sesiones por usuario.
+- Guardar solo el hash del token en la base de datos.
+- Renovar `lastSeenAt` y `expiresAt` en cada request autenticado.
+- Expirar sesiones sin actividad durante siete dias.
+- Revocar solo la sesion actual en logout.
+- Crear `GET /api/auth/me` con usuario, roles y permisos efectivos.
+- Crear tests de login, logout, expiracion, revocacion, usuario inactivo y multiples sesiones.
+
+### Criterios de aceptacion
+
+- La cookie no expone password, roles, permisos ni datos sensibles.
+- Una sesion revocada no puede volver a autenticarse.
+- El MVP puede permanecer abierto hasta completar la autorizacion de la Fase 18.
+
+## 22. Fase 18: Backend Authorization
+
+### Objetivo
+
+Proteger la API mediante sesion autenticada y permisos globales.
+
+### Entregables
+
+- Crear guard de sesion.
+- Crear decorator y guard de permisos.
+- Resolver permisos efectivos a partir de multiples roles.
+- Proteger endpoints de dashboard, maquinas, planes, logs y notificaciones.
+- Respetar las transiciones de negocio existentes despues de validar permisos.
+- Agregar tests de `401`, `403` y matriz de roles.
+
+### Matriz minima
+
+- `Admin`: todos los permisos.
+- `Maintenance Manager`: gestion completa del dominio operativo.
+- `Technician`: lectura, creacion de logs y transiciones operativas asignadas por la politica global.
+- `Viewer`: lectura.
+
+### Criterios de aceptacion
+
+- La seguridad no depende de la UI.
+- No existe endpoint operativo sensible sin permiso asignado.
+- Un usuario puede acumular permisos mediante multiples roles.
+
+## 23. Fase 19: Frontend Auth
+
+### Objetivo
+
+Conectar el frontend con la sesion real y reflejar capacidades sin duplicar features.
+
+### Entregables
+
+- Crear ruta y formulario de login.
+- Crear provider global de sesion.
+- Configurar cliente HTTP con `credentials: 'include'`.
+- Consultar `/api/auth/me` al cargar la app.
+- Manejar globalmente `401`, `403`, sesion expirada y acceso denegado.
+- Crear logout.
+- Exponer capacidades por permiso a las features.
+- Ocultar o deshabilitar acciones sin permiso solo como mejora de UX.
+
+### Criterios de aceptacion
+
+- Refresh conserva una sesion valida.
+- Logout invalida la sesion actual.
+- `Viewer` no ve acciones de escritura.
+- Una llamada manual sin permiso sigue bloqueada por la API.
+
+## 24. Fase 20: Hardening Auth/Roles
+
+### Objetivo
+
+Validar seguridad basica, regresion y operacion local antes de auditar acciones.
+
+### Entregables
+
+- Revisar cookies, expiracion, renovacion y logout.
+- Validar multiples sesiones y revocacion individual.
+- Validar usuario inactivo y errores sin filtracion de informacion.
+- Completar tests de regresion y matriz de permisos.
+- Verificar que todas las rutas protegidas tengan permiso asignado.
+- Documentar seed del admin, reset local y flujo de desarrollo.
+- Preparar backlog de auditoria.
+
+### Criterios de aceptacion
+
+- El MVP completo funciona con los cuatro roles.
+- No hay credenciales reales versionadas.
+- No hay endpoint sensible sin proteccion.
+
+## 25. Fase 21: Auditoria
+
+### Objetivo
+
+Registrar acciones criticas despues de contar con identidad real.
+
+### Entregables
+
+- Crear `AuditEvent` con actor, accion, entidad, estado anterior/posterior, `requestId` y fecha.
+- Auditar maquinas, planes, logs, notificaciones y ejecucion del motor preventivo.
+- Registrar identidad de servicio para jobs internos.
+- Sanitizar estados antes de persistirlos.
+- Agregar tests y, si el alcance lo requiere, una consulta interna para `Admin`.
+
+### Restricciones
+
+- No guardar passwords, tokens ni secretos.
+- Los logs de mantenimiento siguen siendo inmutables.
+
+## 26. Orden de trabajo por feature
 
 Cada nueva feature debe seguir este orden:
 
@@ -578,7 +739,7 @@ Cada nueva feature debe seguir este orden:
 9. Ejecutar build y pruebas focalizadas.
 10. Actualizar documentacion si cambia una convencion.
 
-## 20. Verificacion global
+## 27. Verificacion global
 
 Comandos actualmente disponibles:
 
@@ -617,10 +778,9 @@ Orden recomendado de CI una vez exista codigo:
 6. Ejecutar build.
 7. Ejecutar auditoria de Impeccable sobre las rutas frontend.
 
-## 21. Fuera de alcance inicial
+## 28. Fuera del alcance Auth/Roles inicial
 
-- Autenticacion, autorizacion, login, roles, permisos y guards.
-- Auth/Roles queda como el siguiente bloque posterior a la Fase 14.
+- Auditoria permanece fuera del primer bloque Auth/Roles y se implementara en la Fase 21.
 - Multiempresa o multitenancy.
 - Clientes y CRM.
 - Ventas, cotizaciones y facturacion.
@@ -629,9 +789,9 @@ Orden recomendado de CI una vez exista codigo:
 - Aplicacion movil.
 - Integraciones externas de mensajeria.
 
-Estos temas pueden planificarse despues de que las Fases 9 a 14 sean funcionales, estables y verificadas.
+Estos temas pueden planificarse despues de que las Fases 15 a 21 sean funcionales, estables y verificadas.
 
-## 22. Definicion de terminado
+## 29. Definicion de terminado
 
 Una fase se considera terminada solo cuando:
 

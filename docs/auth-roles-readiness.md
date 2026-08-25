@@ -1,202 +1,159 @@
 # Preparacion para Auth y Roles
 
-Este documento define las decisiones y puntos de integracion necesarios para implementar autenticacion y autorizacion despues del MVP operativo. No implementa login, sesiones, JWT, guards, roles ni permisos ejecutables.
+Este documento fija el primer alcance de Auth/Roles y sus puntos de evolucion. No implementa login, sesiones, JWT, guards, roles ni permisos ejecutables.
 
-## Alcance futuro
+## Decisiones aprobadas
 
-La primera implementacion de Auth/Roles debe resolver dos problemas separados:
+- Autenticacion local con `email` o `username` mas password.
+- El `username` es unico y obligatorio; el admin inicial usa `admin`.
+- El admin inicial se crea mediante seed y variables de entorno.
+- Las sesiones se persisten en PostgreSQL y se representan en el navegador con una cookie segura.
+- Se permiten multiples sesiones simultaneas por usuario.
+- La sesion expira por inactividad: siete dias desde `lastSeenAt`.
+- Los permisos son globales en el primer alcance, sin scopes por planta o ubicacion.
+- Un usuario puede tener multiples roles.
+- La auditoria se implementara despues de Auth/Roles.
 
-- **Autenticacion:** demostrar quien es la persona o servicio que realiza la solicitud.
-- **Autorizacion:** decidir si esa identidad puede ejecutar una accion sobre el dominio.
-
-El MVP actual continua funcionando sin control de acceso. Las features ya separan acceso HTTP, hooks y UI, por lo que la futura integracion debe concentrarse en la infraestructura y en las politicas de dominio, no en duplicar formularios o layouts.
+El diseño debe permitir agregar despues OIDC, scopes por planta, cuentas de servicio y auditoria sin acoplar esas decisiones a las features.
 
 ## Roles candidatos
 
-| Rol | Responsabilidad | Nivel de acceso esperado |
-| --- | --- | --- |
-| `Admin` | Configuracion global y operacion completa | Todas las acciones del MVP |
-| `Maintenance Manager` | Coordinar activos, planes, historial y alertas | Gestion operativa, sin administracion de identidad |
-| `Technician` | Ejecutar y documentar trabajos tecnicos | Lectura operativa, registro de logs y transiciones asignadas |
-| `Viewer` | Consultar el estado operativo | Solo lectura |
+| Rol                   | Responsabilidad                                | Acceso esperado                                     |
+| --------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| `Admin`               | Configuracion global y operacion completa      | Todas las acciones del MVP                          |
+| `Maintenance Manager` | Coordinar activos, planes, historial y alertas | Gestion operativa, sin administrar identidad        |
+| `Technician`          | Ejecutar y documentar trabajos tecnicos        | Lectura, registro de logs y transiciones operativas |
+| `Viewer`              | Consultar el estado operativo                  | Solo lectura                                        |
 
-Estos roles son candidatos iniciales, no valores que deban hardcodearse en componentes frontend. La implementacion debe autorizar permisos y usar roles como agrupaciones administrables de permisos.
+Los roles son agrupaciones de permisos. No deben hardcodearse en componentes frontend.
 
-## Permisos candidatos
+## Permisos globales
 
-Los permisos deben expresarse como acciones de dominio con el formato `resource:action`.
+Los permisos usan el formato `resource:action`.
 
-### Dashboard
+| Recurso           | Permisos                                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard         | `dashboard:read`                                                                                                                               |
+| Machines          | `machines:read`, `machines:create`, `machines:update`, `machines:retire`                                                                       |
+| Maintenance Plans | `maintenance-plans:read`, `maintenance-plans:create`, `maintenance-plans:update`, `maintenance-plans:activate`, `maintenance-plans:deactivate` |
+| Maintenance Logs  | `maintenance-logs:read`, `maintenance-logs:create`                                                                                             |
+| Notifications     | `notifications:read`, `notifications:acknowledge`, `notifications:resolve`, `notifications:dismiss`, `notifications:process-preventive`        |
 
-| Permiso | Descripcion |
-| --- | --- |
-| `dashboard:read` | Consultar resumen operativo y metricas |
+Los logs no tendran permisos de edicion o eliminacion desde la UI. Una correccion futura debe ser un nuevo registro relacionado o una operacion auditable.
 
-### Machines
+## Matriz inicial
 
-| Permiso | Descripcion |
-| --- | --- |
-| `machines:read` | Consultar y filtrar maquinas |
-| `machines:create` | Registrar una maquina |
-| `machines:update` | Actualizar datos operativos |
-| `machines:retire` | Retirar o desactivar una maquina |
+| Permiso                            | Admin | Maintenance Manager | Technician | Viewer |
+| ---------------------------------- | ----: | ------------------: | ---------: | -----: |
+| `dashboard:read`                   |    Si |                  Si |         Si |     Si |
+| `machines:read`                    |    Si |                  Si |         Si |     Si |
+| `machines:create`                  |    Si |                  Si |         No |     No |
+| `machines:update`                  |    Si |                  Si |         No |     No |
+| `machines:retire`                  |    Si |                  Si |         No |     No |
+| `maintenance-plans:read`           |    Si |                  Si |         Si |     Si |
+| `maintenance-plans:create`         |    Si |                  Si |         No |     No |
+| `maintenance-plans:update`         |    Si |                  Si |         No |     No |
+| `maintenance-plans:activate`       |    Si |                  Si |         No |     No |
+| `maintenance-plans:deactivate`     |    Si |                  Si |         No |     No |
+| `maintenance-logs:read`            |    Si |                  Si |         Si |     Si |
+| `maintenance-logs:create`          |    Si |                  Si |         Si |     No |
+| `notifications:read`               |    Si |                  Si |         Si |     Si |
+| `notifications:acknowledge`        |    Si |                  Si |         Si |     No |
+| `notifications:resolve`            |    Si |                  Si |         Si |     No |
+| `notifications:dismiss`            |    Si |                  Si |         No |     No |
+| `notifications:process-preventive` |    Si |                  Si |         No |     No |
 
-### Maintenance Plans
+## Modelo de sesion aprobado
 
-| Permiso | Descripcion |
-| --- | --- |
-| `maintenance-plans:read` | Consultar planes y vencimientos |
-| `maintenance-plans:create` | Crear un plan preventivo |
-| `maintenance-plans:update` | Actualizar frecuencia, ventana y datos del plan |
-| `maintenance-plans:activate` | Activar un plan |
-| `maintenance-plans:deactivate` | Desactivar un plan |
+Modelos previstos:
 
-### Maintenance Logs
+- `User`: `username`, `email`, `name`, `passwordHash`, `isActive`.
+- `Role`: nombre y descripcion.
+- `Permission`: clave y descripcion.
+- `UserRole`: relacion muchos-a-muchos entre usuarios y roles.
+- `RolePermission`: relacion muchos-a-muchos entre roles y permisos.
+- `Session`: usuario, hash del token, `lastSeenAt`, `expiresAt`, `revokedAt` y timestamps.
 
-| Permiso | Descripcion |
-| --- | --- |
-| `maintenance-logs:read` | Consultar el historial |
-| `maintenance-logs:create` | Registrar un mantenimiento o incidente |
+Flujo de expiracion:
 
-Los logs deben permanecer sin permisos de edicion o eliminacion. Si se necesita corregir un registro, la politica futura debe definir una correccion auditable o un nuevo registro relacionado.
+1. Login crea una sesion independiente.
+2. La cookie contiene un token opaco; nunca contiene password, roles o permisos.
+3. La base de datos guarda solo el hash del token.
+4. Cada request autenticado valida `revokedAt` y `expiresAt`.
+5. Si la sesion sigue activa, actualiza `lastSeenAt` y calcula `expiresAt = now + 7 dias`.
+6. Una sesion sin actividad durante siete dias deja de ser valida.
+7. Logout revoca solo la sesion actual; las demas sesiones permanecen activas.
 
-### Notifications
+Cookie prevista:
 
-| Permiso | Descripcion |
-| --- | --- |
-| `notifications:read` | Consultar la bandeja |
-| `notifications:acknowledge` | Reconocer una alerta |
-| `notifications:resolve` | Resolver una alerta |
-| `notifications:dismiss` | Descartar una alerta |
-| `notifications:process-preventive` | Ejecutar manualmente el motor preventivo |
+- `HttpOnly`.
+- `SameSite=Lax`.
+- `Secure` en produccion.
+- `Path=/`.
+- Nombre y dominio configurables por entorno.
 
-## Matriz inicial de roles
+## Seed inicial
 
-| Permiso | Admin | Maintenance Manager | Technician | Viewer |
-| --- | ---: | ---: | ---: | ---: |
-| `dashboard:read` | Si | Si | Si | Si |
-| `machines:read` | Si | Si | Si | Si |
-| `machines:create` | Si | Si | No | No |
-| `machines:update` | Si | Si | No | No |
-| `machines:retire` | Si | Si | No | No |
-| `maintenance-plans:read` | Si | Si | Si | Si |
-| `maintenance-plans:create` | Si | Si | No | No |
-| `maintenance-plans:update` | Si | Si | No | No |
-| `maintenance-plans:activate` | Si | Si | No | No |
-| `maintenance-plans:deactivate` | Si | Si | No | No |
-| `maintenance-logs:read` | Si | Si | Si | Si |
-| `maintenance-logs:create` | Si | Si | Si | No |
-| `notifications:read` | Si | Si | Si | Si |
-| `notifications:acknowledge` | Si | Si | Si | No |
-| `notifications:resolve` | Si | Si | Si | No |
-| `notifications:dismiss` | Si | Si | No | No |
-| `notifications:process-preventive` | Si | Si | No | No |
+El seed debe ser repetible y crear permisos, roles y el admin inicial sin versionar secretos:
 
-La matriz requiere una decision adicional sobre asignacion de maquina, planta o ubicacion. Un tecnico no deberia poder operar alertas o registrar logs fuera de su alcance asignado solo por tener el permiso global.
+```text
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@example.local
+ADMIN_NAME=Local Administrator
+ADMIN_PASSWORD=<solo-entorno-local>
+```
 
-## Puntos de integracion backend
+El seed debe fallar de forma explicita si faltan variables obligatorias para crear el admin. Nunca debe generar una password conocida por defecto.
 
-### Contexto de identidad
+## Integracion backend
 
-La API debe construir un contexto de solicitud despues de autenticarla, por ejemplo:
+- Crear un modulo `auth` responsable de login, logout, `me`, hashing y sesiones.
+- Normalizar la identidad autenticada en un contexto interno:
 
 ```ts
 type RequestIdentity = {
   userId: string;
   roles: string[];
   permissions: string[];
-  siteIds?: string[];
 };
 ```
 
-La forma final depende del proveedor de identidad, pero los servicios de dominio no deben depender de claims sin normalizar. Un adaptador de autenticacion debe traducir el token externo a un contexto interno estable.
+- Agregar guard de sesion y guard/decorator de permisos en fases separadas.
+- Proteger cada endpoint segun `resource:action`.
+- Revalidar permisos en backend; ocultar botones nunca sustituye autorizacion.
+- Permitir una identidad de servicio auditable para el job preventivo.
 
-### Proteccion de endpoints
+Endpoints iniciales:
 
-- Resolver identidad en un modulo de infraestructura de autenticacion.
-- Aplicar autenticacion a las rutas protegidas mediante guards globales o por modulo.
-- Aplicar permisos por accion en controllers o policies cercanas al dominio.
-- Revalidar reglas de negocio en el service; ocultar un boton no es autorizacion.
-- Mantener las transiciones de notificaciones como acciones separadas y autorizables.
-- Mantener el endpoint `process-preventive` restringido a `notifications:process-preventive`.
-- Permitir que jobs internos usen una identidad de servicio auditable, no un usuario simulado.
+- `POST /api/auth/login`: recibe `identifier` y `password`; `identifier` acepta email o username.
+- `POST /api/auth/logout`: revoca la sesion actual.
+- `GET /api/auth/me`: devuelve usuario, roles y permisos efectivos.
 
-### Evolucion de datos
+## Integracion frontend
 
-Los siguientes campos actuales son temporales y deben migrar cuando exista identidad:
+- Crear provider global de sesion.
+- Usar un cliente HTTP global con `credentials: 'include'`.
+- Centralizar estados `401`, `403`, sesion expirada y acceso denegado.
+- Entregar capacidades derivadas a las features, como `canCreateMachine`.
+- Usar permisos efectivos, no nombres de roles, para mostrar u ocultar acciones.
+- Mantener la autorizacion real en el backend.
 
-| Ubicacion actual | Evolucion propuesta |
-| --- | --- |
-| `MaintenanceLog.performedBy` | Agregar `performedByUserId` y conservar un snapshot visible si se necesita historial |
-| Creacion de `MaintenanceLog` | Derivar el actor del contexto, no aceptar el responsable como unica fuente del request |
-| Transiciones de `Notification` | Agregar actor por transicion o resolverlo con auditoria |
-| Cambios de `Machine` | Registrar actor y motivo en auditoria |
-| Cambios de `MaintenancePlan` | Registrar actor y motivo en auditoria |
+## Evolucion de datos
 
-No se debe eliminar el texto historico de `performedBy` sin una migracion y una decision explicita de retencion.
+- Migrar `MaintenanceLog.performedBy` hacia `performedByUserId`, conservando snapshot si el historial lo requiere.
+- Derivar el responsable del contexto autenticado y no confiar exclusivamente en texto enviado por el cliente.
+- Reservar actor por transicion de notificaciones para la fase de auditoria.
+- Mantener globales los permisos ahora, pero no bloquear una futura columna de scope.
 
-## Puntos de integracion frontend
+## Auditoria posterior
 
-- Agregar un provider global de sesion cuando exista un proveedor elegido.
-- Centralizar el usuario actual y el estado de autenticacion en infraestructura global, no en cada feature.
-- Agregar el token o cookie al cliente HTTP global de forma segura.
-- Convertir respuestas `401` y `403` en estados globales de sesion y permisos.
-- Permitir que las features reciban capacidades derivadas, por ejemplo `canCreateMachine`, sin conocer la implementacion del proveedor.
-- Ocultar o deshabilitar acciones solo como mejora de UX; el backend continua siendo la fuente de autorizacion.
-- Mantener rutas y componentes descriptivos independientes del rol para evitar duplicar paginas.
-- Definir una pantalla global para acceso denegado y una ruta de sesion expirada.
+La auditoria queda fuera del primer alcance Auth/Roles. Cuando se implemente, debera registrar como minimo:
 
-## Auditoria futura
+- Actor real o identidad de servicio.
+- Accion ejecutada.
+- Tipo e identificador de entidad.
+- Estado anterior y posterior sanitizados.
+- Motivo cuando corresponda.
+- `requestId` y fecha.
 
-La auditoria debe registrar cambios y transiciones, no solo errores. Una entidad o stream futuro puede usar esta forma minima:
-
-| Campo | Proposito |
-| --- | --- |
-| `id` | Identificador UUID del evento |
-| `actorId` | Usuario o identidad de servicio |
-| `action` | Permiso o accion ejecutada |
-| `entityType` | `Machine`, `MaintenancePlan`, `MaintenanceLog` o `Notification` |
-| `entityId` | Registro afectado |
-| `before` | Estado anterior sanitizado, cuando aplique |
-| `after` | Estado nuevo sanitizado, cuando aplique |
-| `reason` | Motivo operativo, si es requerido |
-| `requestId` | Correlacion tecnica |
-| `createdAt` | Fecha del evento |
-| `ipAddress` y `userAgent` | Contexto de seguridad, sujeto a politica de privacidad |
-
-### Eventos minimos
-
-- `Machine`: create, update, retire.
-- `MaintenancePlan`: create, update, activate, deactivate.
-- `MaintenanceLog`: create; no update/delete desde la UI.
-- `Notification`: acknowledge, resolve, dismiss.
-- Motor preventivo: process, incluyendo identidad de usuario o servicio y resumen de resultados.
-- Cambios de permisos y roles cuando exista administracion de identidad.
-
-Los valores sensibles deben sanitizarse antes de persistir `before` y `after`. La auditoria no debe guardar tokens, contrasenas ni secretos.
-
-## Decisiones pendientes para Auth/Roles
-
-1. Elegir proveedor de identidad y estrategia: sesiones seguras, OIDC o JWT con rotacion y revocacion.
-2. Definir donde viven usuarios, roles y permisos: base local, proveedor externo o modelo hibrido.
-3. Confirmar si el alcance sera global o por planta/ubicacion.
-4. Definir administracion de roles, invitaciones, baja y recuperacion de acceso.
-5. Definir expiracion, renovacion y revocacion de sesiones.
-6. Definir politica para cuentas de servicio y jobs programados.
-7. Definir retencion, acceso y exportacion de auditoria.
-8. Definir tratamiento de datos personales y cumplimiento aplicable.
-9. Definir que acciones requieren motivo obligatorio o aprobacion adicional.
-10. Definir estrategia de migracion de `performedBy` a identidad real.
-
-## Siguiente bloque de trabajo
-
-La siguiente fase despues de esta preparacion debe implementar, en este orden:
-
-1. Modelo y proveedor de identidad.
-2. Contexto interno de usuario y sesiones.
-3. Roles y permisos persistidos.
-4. Guards y policies en la API.
-5. Auditoria de acciones criticas.
-6. Provider de sesion y manejo global de `401`/`403` en frontend.
-7. Aplicacion progresiva de capacidades en las features existentes.
-8. Pruebas de matriz de permisos y pruebas de regresion del MVP.
+Eventos iniciales: cambios de maquinas, cambios y transiciones de planes, creacion de logs, transiciones de notificaciones y ejecucion del motor preventivo. Nunca guardar passwords, tokens ni secretos.

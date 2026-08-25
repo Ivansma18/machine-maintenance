@@ -265,7 +265,7 @@ No es obligatorio para el primer CRUD, pero conviene reservar el concepto para A
 Campos sugeridos cuando se implemente:
 
 - `id`: UUID primary key.
-- `name`, `email`, `isActive`.
+- `username`, `name`, `email`, `passwordHash`, `isActive`.
 - `createdAt`, `updatedAt`.
 
 El rol no debe quedar como un string unico en `User` si se requiere mas de un rol por usuario. La implementacion futura debe decidir entre roles persistidos localmente, un proveedor externo o un modelo hibrido.
@@ -276,6 +276,8 @@ Uso futuro:
 - Asignar responsables a notificaciones o planes.
 - Derivar permisos desde roles administrables, no desde condiciones hardcodeadas en features.
 - Registrar el actor de cambios y transiciones en una auditoria separada.
+
+El primer alcance usa permisos globales, acepta email o username en el login local, permite multiples sesiones por usuario y expira sesiones por inactividad despues de siete dias. La matriz de roles, el seed del admin y el roadmap Auth/Roles estan documentados en `docs/auth-roles-readiness.md` y `DEVELOPMENT_PLAN.md`.
 
 La matriz de roles, permisos candidatos, puntos de integracion y decisiones pendientes esta documentada en `docs/auth-roles-readiness.md`.
 
