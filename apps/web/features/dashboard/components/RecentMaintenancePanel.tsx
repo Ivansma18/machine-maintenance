@@ -3,9 +3,9 @@ import { AnimatedList } from '@/components/motion/AnimatedList';
 import { AnimatedListItem } from '@/components/motion/AnimatedListItem';
 import { AppPanel } from '@/components/ui/AppPanel';
 import { AppTag } from '@/components/ui/AppTag';
+import { formatDateTime } from '@/lib/formatters/dateFormatters';
 
 import {
-  formatDashboardDate,
   getMaintenanceTypeLabel,
   getResultLabel,
   getResultTone,
@@ -30,7 +30,7 @@ export function RecentMaintenancePanel({ logs }: { logs: DashboardSummary['recen
                     </p>
                     <p className="m-0 mt-1 truncate text-xs text-[#68736f]">
                       {log.maintenancePlan?.name ?? getMaintenanceTypeLabel(log.type)} ·{' '}
-                      {formatDashboardDate(log.performedAt)}
+                      {formatDateTime(log.performedAt)}
                     </p>
                   </div>
                   <AppTag tone={getResultTone(log.result)}>{getResultLabel(log.result)}</AppTag>

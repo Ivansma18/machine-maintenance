@@ -45,12 +45,3 @@ export function getMachineCriticalityTone(criticality: MachineCriticality) {
   if (criticality === 'LOW') return 'success' as const;
   return 'neutral' as const;
 }
-
-export function formatMachineDate(value: string | null) {
-  if (!value) return 'No registrada';
-  return new Intl.DateTimeFormat('es-MX', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value));
-}

@@ -3,7 +3,7 @@ type OperationsSidebarProps = { activeHref: string };
 const navigation = [
   { href: '/', label: 'Resumen' },
   { href: '/machines', label: 'Maquinas' },
-  { href: '/maintenance-plans', label: 'Plan preventivo' },
+  { href: '/maintenance-plans', label: 'Planes preventivos' },
   { href: '/notifications', label: 'Alertas' },
 ];
 

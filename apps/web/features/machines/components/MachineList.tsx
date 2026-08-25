@@ -2,10 +2,10 @@ import { AnimatedList } from '@/components/motion/AnimatedList';
 import { AnimatedListItem } from '@/components/motion/AnimatedListItem';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppTag } from '@/components/ui/AppTag';
+import { formatDateOnly } from '@/lib/formatters/dateFormatters';
 
 import type { Machine } from '../types';
 import {
-  formatMachineDate,
   getMachineCategoryLabel,
   getMachineCriticalityLabel,
   getMachineCriticalityTone,
@@ -50,7 +50,7 @@ export function MachineList({ machines, onEdit, onRetire }: MachineListProps) {
             <div>
               <p className="eyebrow">Instalada</p>
               <p className="m-0 mt-1 text-sm text-[#68736f]">
-                {formatMachineDate(machine.installedAt)}
+                {formatDateOnly(machine.installedAt)}
               </p>
             </div>
             <div className="flex justify-end gap-2">

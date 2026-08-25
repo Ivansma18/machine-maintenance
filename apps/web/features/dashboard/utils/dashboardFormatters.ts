@@ -1,14 +1,5 @@
 import type { DashboardMachineDistribution, DashboardResult, DashboardSummary } from '../types';
 
-export function formatDashboardDate(value: string) {
-  return new Intl.DateTimeFormat('es-MX', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
-}
-
 export function getResultTone(result: DashboardResult) {
   if (result === 'CRITICAL_FAILURE') return 'critical' as const;
   if (result === 'FAILED') return 'warning' as const;
