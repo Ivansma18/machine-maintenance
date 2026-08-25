@@ -16,6 +16,8 @@ Este documento fija el primer alcance de Auth/Roles y sus puntos de evolucion. N
 
 El diseño debe permitir agregar despues OIDC, scopes por planta, cuentas de servicio y auditoria sin acoplar esas decisiones a las features.
 
+El contrato tecnico detallado de esta preparacion esta en `docs/auth-roles-technical-design.md`. Ese documento es la referencia de implementacion para la Fase 16 y las fases posteriores.
+
 ## Roles candidatos
 
 | Rol                   | Responsabilidad                                | Acceso esperado                                     |

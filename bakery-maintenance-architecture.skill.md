@@ -279,7 +279,7 @@ Uso futuro:
 
 El primer alcance usa permisos globales, acepta email o username en el login local, permite multiples sesiones por usuario y expira sesiones por inactividad despues de siete dias. La matriz de roles, el seed del admin y el roadmap Auth/Roles estan documentados en `docs/auth-roles-readiness.md` y `DEVELOPMENT_PLAN.md`.
 
-La matriz de roles, permisos candidatos, puntos de integracion y decisiones pendientes esta documentada en `docs/auth-roles-readiness.md`.
+La matriz de roles, permisos, puntos de integracion y decisiones de evolucion esta documentada en `docs/auth-roles-readiness.md` y `docs/auth-roles-technical-design.md`.
 
 ## Enums Prisma sugeridos
 
