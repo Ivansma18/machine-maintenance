@@ -16,7 +16,7 @@ No se implementaran ventas, clientes, facturacion, inventario ni otros modulos E
 
 ## 2. Estado actual
 
-El repositorio se encuentra en preparacion de las siguientes fases; la Fase 1 frontend y la base de la Fase 2 backend ya fueron implementadas y verificadas.
+Las Fases 1 a 8 ya fueron implementadas y verificadas. El siguiente bloque corresponde al frontend operativo del MVP, seguido de una preparacion documental para Auth/Roles sin implementar autenticacion ni autorizacion.
 
 Ya esta definido:
 
@@ -36,7 +36,7 @@ Dependencias frontend base:
 - `@ant-design/nextjs-registry`.
 - Motion.dev mediante el paquete `motion`.
 
-La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible. La Fase 4 agrega el vertical backend de maquinas con CRUD, filtros y desactivacion segura. La Fase 5 agrega planes preventivos, calculo de vencimientos y activacion segura. La Fase 6 agrega el historial de mantenimientos y alertas urgentes para fallos criticos. La Fase 7 agrega el motor preventivo, bandeja de notificaciones, transiciones de estado y job horario. La Fase 8 agrega el dashboard operativo conectado al resumen de la API.
+La app Next.js base de la Fase 1 existe en `apps/web`. La Fase 2 ya incluye NestJS, Prisma 7, configuracion de PostgreSQL, validacion global, lifecycle de Prisma y `/api/health`; la conexion efectiva requiere credenciales locales validas en `apps/api/.env`. La Fase 3 agrega el modelo de datos inicial, la migracion y el seed repetible. La Fase 4 agrega el vertical backend de maquinas con CRUD, filtros y desactivacion segura. La Fase 5 agrega planes preventivos, calculo de vencimientos y activacion segura. La Fase 6 agrega el historial de mantenimientos y alertas urgentes para fallos criticos. La Fase 7 agrega el motor preventivo, bandeja de notificaciones, transiciones de estado y job horario. La Fase 8 agrega el dashboard operativo conectado al resumen de la API. Las Fases 9 a 13 completan el frontend operativo del MVP y la Fase 14 prepara el sistema para Auth/Roles sin implementarlo.
 
 ## 3. Stack y reglas no negociables
 
@@ -367,7 +367,196 @@ Para cada `MaintenancePlan` activo:
 - Usar Motion.dev para transiciones de secciones, listas y estados, no para distraer.
 - Aplicar Impeccable a la composicion, jerarquia, densidad y consistencia visual.
 
-## 13. Orden de trabajo por feature
+## 13. Fase 9: Frontend Machines
+
+### Objetivo
+
+Construir la primera pantalla operativa completa del frontend para administrar las maquinas del sistema.
+
+### Entregables
+
+- Crear la ruta `apps/web/app/machines/page.tsx` como entrypoint minimo de Next.js.
+- Crear la pagina descriptiva `MachinesPage` dentro de `apps/web/features/machines`.
+- Crear el cliente API para listar, crear, actualizar y desactivar maquinas.
+- Crear hooks para carga, filtros, paginacion, creacion, edicion, desactivacion, retry y refresh.
+- Crear listado o tabla responsive de maquinas.
+- Agregar filtros por busqueda, estado y categoria.
+- Agregar acciones para crear, editar y desactivar.
+- Agregar confirmacion para la desactivacion.
+- Cubrir estados loading, empty, error, success y acciones en progreso.
+
+### Reglas de negocio
+
+- Una maquina desactivada no se elimina fisicamente.
+- Las maquinas retiradas deben seguir siendo visibles cuando el usuario filtre por ese estado.
+- Los formularios deben respetar las validaciones existentes del backend.
+- La UI debe mostrar claramente maquinas activas, inactivas, retiradas y bajo mantenimiento.
+
+### Criterios de aceptacion
+
+- La feature consume exclusivamente los endpoints existentes de `apps/api/src/machines`.
+- `page.tsx` solo compone `MachinesPage`.
+- La feature no importa directamente `antd`, `@ant-design/icons`, `motion/react` ni `motion/react-m`.
+- Las acciones actualizan el listado sin requerir una recarga manual de la pagina.
+- `npm run build:web` y las pruebas focalizadas pasan.
+- La auditoria de Impeccable no reporta problemas relevantes.
+
+## 14. Fase 10: Frontend Maintenance Plans
+
+### Objetivo
+
+Permitir administrar las frecuencias preventivas asociadas a las maquinas.
+
+### Entregables
+
+- Crear la ruta `apps/web/app/maintenance-plans/page.tsx`.
+- Crear la pagina descriptiva `MaintenancePlansPage` dentro de `apps/web/features/maintenance-plans`.
+- Crear el cliente API para listar, crear, actualizar, activar y desactivar planes.
+- Crear hooks para listado, filtros, formularios, retry y refresh.
+- Mostrar los planes preventivos con su maquina asociada, frecuencia, proxima fecha y estado.
+- Agregar filtros por maquina, estado activo/inactivo y situacion de vencimiento.
+- Crear formulario para frecuencia, ventana preventiva, proxima fecha y maquina.
+- Mostrar indicadores `dueSoon` y `overdue`.
+- Cubrir estados loading, empty, error, success, warning y critical.
+
+### Reglas de negocio
+
+- Activar o desactivar un plan no elimina el historial de mantenimientos.
+- Las fechas calculadas por el backend son la fuente de verdad para `dueSoon` y `overdue`.
+- Un plan inactivo no debe presentarse como trabajo preventivo pendiente.
+- Los formularios deben respetar las validaciones y limites existentes del backend.
+
+### Criterios de aceptacion
+
+- La pantalla permite identificar rapidamente los planes que requieren atencion.
+- Las acciones actualizan la vista sin recarga manual.
+- `page.tsx` solo compone `MaintenancePlansPage`.
+- No existen imports prohibidos dentro de la feature.
+- `npm run build:web` y las pruebas focalizadas pasan.
+- La auditoria de Impeccable no reporta problemas relevantes.
+
+## 15. Fase 11: Frontend Maintenance Logs
+
+### Objetivo
+
+Registrar mantenimientos desde la UI y consultar el historial operativo sin permitir modificaciones posteriores.
+
+### Entregables
+
+- Crear la ruta `apps/web/app/maintenance-logs/page.tsx`.
+- Crear la pagina descriptiva `MaintenanceLogsPage` dentro de `apps/web/features/maintenance-logs`.
+- Crear el cliente API para listar y registrar mantenimientos.
+- Crear hooks para listado, filtros, registro, retry y refresh.
+- Crear formulario para mantenimiento preventivo, correctivo e inspeccion.
+- Crear historial filtrable por maquina, tipo, resultado y fecha.
+- Mostrar `OK`, `NEEDS_FOLLOW_UP`, `FAILED` y `CRITICAL_FAILURE` con jerarquia visual clara.
+- Cubrir estados loading, empty, error, success, warning y critical.
+
+### Reglas de negocio
+
+- Los logs son inmutables desde la UI: no se editan ni eliminan.
+- Un resultado `CRITICAL_FAILURE` debe comunicar que existe una consecuencia urgente en el sistema de notificaciones.
+- El historial debe mostrar maquina, plan cuando exista, fecha, responsable, tipo y resultado.
+- La UI no debe duplicar reglas de calculo que pertenecen al backend.
+
+### Criterios de aceptacion
+
+- El usuario puede registrar un mantenimiento valido desde el frontend.
+- El usuario puede consultar el historial de forma comprensible.
+- Los errores de validacion se muestran junto al campo correspondiente.
+- `page.tsx` solo compone `MaintenanceLogsPage`.
+- `npm run build:web` y las pruebas focalizadas pasan.
+- La auditoria de Impeccable no reporta problemas relevantes.
+
+## 16. Fase 12: Frontend Notifications
+
+### Objetivo
+
+Construir la bandeja operativa de alertas y permitir gestionar sus transiciones de estado.
+
+### Entregables
+
+- Crear la ruta `apps/web/app/notifications/page.tsx`.
+- Crear la pagina descriptiva `NotificationsPage` dentro de `apps/web/features/notifications`.
+- Crear el cliente API para listar, reconocer, resolver, descartar y procesar notificaciones preventivas.
+- Crear hooks para listado, filtros, acciones, retry y refresh.
+- Agregar filtros por severidad, estado, tipo y maquina.
+- Agregar acciones `acknowledge`, `resolve`, `dismiss` y `process preventive notifications`.
+- Diferenciar visualmente warning, urgent y critical.
+- Cubrir estados loading, empty, error, success, warning y critical.
+
+### Reglas de negocio
+
+- Las alertas criticas no deben quedar ocultas dentro de componentes secundarios.
+- Las transiciones de estado deben respetar las reglas del backend.
+- Ejecutar manualmente el motor preventivo debe refrescar la bandeja.
+- La UI debe diferenciar alertas preventivas de alertas generadas por fallos criticos.
+
+### Criterios de aceptacion
+
+- El usuario puede localizar rapidamente las alertas abiertas mas importantes.
+- Las acciones reflejan su resultado y actualizan el estado visible.
+- `page.tsx` solo compone `NotificationsPage`.
+- No existen imports prohibidos dentro de la feature.
+- `npm run build:web` y las pruebas focalizadas pasan.
+- La auditoria de Impeccable no reporta problemas relevantes.
+
+## 17. Fase 13: Navigation y App Shell operativo
+
+### Objetivo
+
+Consolidar la navegacion entre las pantallas principales del MVP antes de iniciar Auth/Roles.
+
+### Entregables
+
+- Crear o consolidar un app shell compartido para dashboard y features operativas.
+- Agregar navegacion entre Dashboard, Machines, Maintenance Plans, Maintenance Logs y Notifications.
+- Mostrar estado activo de la ruta actual.
+- Mantener una experiencia responsive para desktop y mobile.
+- Unificar headers, breadcrumbs, acciones principales, botones, tags y feedback.
+- Unificar manejo de loading, empty, error, success, warning y critical.
+- Revisar accesibilidad de navegacion, formularios, tablas, drawers y confirmaciones.
+
+### Criterios de aceptacion
+
+- Todas las rutas principales son navegables sin introducir URLs manualmente.
+- La navegacion mantiene contexto suficiente para el usuario operativo.
+- El app shell no duplica layout entre features.
+- La experiencia funciona en desktop y mobile.
+- Las features siguen usando exclusivamente wrappers propios.
+- `npm run build:web` y las pruebas focalizadas pasan.
+- La auditoria de Impeccable cubre las rutas principales.
+
+## 18. Fase 14: Preparacion pre-Auth/Roles
+
+### Objetivo
+
+Dejar documentados los puntos de integracion y permisos necesarios para una futura fase de autenticacion y autorizacion, sin implementar Auth/Roles.
+
+### Entregables
+
+- Revisar donde impactaran permisos en maquinas, planes, logs y notificaciones.
+- Documentar roles candidatos: `Admin`, `Maintenance Manager`, `Technician` y `Viewer`.
+- Documentar permisos candidatos por feature y accion.
+- Identificar operaciones que requeriran identidad real del usuario.
+- Identificar auditoria adicional necesaria para cambios y transiciones de estado.
+- Actualizar documentacion de arquitectura con las decisiones pendientes.
+
+### Restricciones
+
+- No implementar login.
+- No implementar sesiones, guards, JWT, roles ni permisos.
+- No agregar usuarios simulados como solucion temporal.
+- No condicionar acciones mediante roles hardcodeados.
+
+### Criterios de aceptacion
+
+- El MVP operativo funciona localmente sin control de acceso.
+- Las decisiones necesarias para Auth/Roles quedan documentadas.
+- Los futuros puntos de integracion no requieren reestructurar las features existentes.
+- El siguiente bloque de trabajo queda definido como diseno e implementacion de Auth/Roles.
+
+## 19. Orden de trabajo por feature
 
 Cada nueva feature debe seguir este orden:
 
@@ -382,7 +571,7 @@ Cada nueva feature debe seguir este orden:
 9. Ejecutar build y pruebas focalizadas.
 10. Actualizar documentacion si cambia una convencion.
 
-## 14. Verificacion global
+## 20. Verificacion global
 
 Comandos actualmente disponibles:
 
@@ -415,9 +604,10 @@ Orden recomendado de CI una vez exista codigo:
 6. Ejecutar build.
 7. Ejecutar auditoria de Impeccable sobre las rutas frontend.
 
-## 15. Fuera de alcance inicial
+## 21. Fuera de alcance inicial
 
-- Autenticacion y autorizacion avanzada, salvo que sea necesaria para operar el MVP.
+- Autenticacion, autorizacion, login, roles, permisos y guards.
+- Auth/Roles queda como el siguiente bloque posterior a la Fase 14.
 - Multiempresa o multitenancy.
 - Clientes y CRM.
 - Ventas, cotizaciones y facturacion.
@@ -426,9 +616,9 @@ Orden recomendado de CI una vez exista codigo:
 - Aplicacion movil.
 - Integraciones externas de mensajeria.
 
-Estos temas pueden planificarse despues de que maquinas, planes, logs y notificaciones sean funcionales y estables.
+Estos temas pueden planificarse despues de que las Fases 9 a 14 sean funcionales, estables y verificadas.
 
-## 16. Definicion de terminado
+## 22. Definicion de terminado
 
 Una fase se considera terminada solo cuando:
 
