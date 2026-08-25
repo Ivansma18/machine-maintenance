@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatedSection } from '@/components/motion/AnimatedSection';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppPanel } from '@/components/ui/AppPanel';
 import { AppShell } from '@/components/layout/AppShell';
@@ -22,12 +23,14 @@ export function NotificationsPage() {
         eyebrow: 'Espacio de trabajo / control',
         title: 'Alertas operativas',
         action: (
-          <AppButton
-            loading={notifications.actionLoading}
-            onClick={() => void notifications.processPreventive()}
-          >
-            Procesar preventivos
-          </AppButton>
+          <PermissionGate permission="notifications:process-preventive">
+            <AppButton
+              loading={notifications.actionLoading}
+              onClick={() => void notifications.processPreventive()}
+            >
+              Procesar preventivos
+            </AppButton>
+          </PermissionGate>
         ),
       }}
     >

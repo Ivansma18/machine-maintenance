@@ -2,6 +2,7 @@ import { AnimatedList } from '@/components/motion/AnimatedList';
 import { AnimatedListItem } from '@/components/motion/AnimatedListItem';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppTag } from '@/components/ui/AppTag';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { formatDateOnly } from '@/lib/formatters/dateFormatters';
 
 import type { Machine } from '../types';
@@ -54,13 +55,17 @@ export function MachineList({ machines, onEdit, onRetire }: MachineListProps) {
               </p>
             </div>
             <div className="flex justify-end gap-2">
-              <AppButton variant="quiet" onClick={() => onEdit(machine)}>
-                Editar
-              </AppButton>
-              {machine.status !== 'RETIRED' ? (
-                <AppButton variant="danger" onClick={() => onRetire(machine)}>
-                  Retirar
+              <PermissionGate permission="machines:update">
+                <AppButton variant="quiet" onClick={() => onEdit(machine)}>
+                  Editar
                 </AppButton>
+              </PermissionGate>
+              {machine.status !== 'RETIRED' ? (
+                <PermissionGate permission="machines:retire">
+                  <AppButton variant="danger" onClick={() => onRetire(machine)}>
+                    Retirar
+                  </AppButton>
+                </PermissionGate>
               ) : null}
             </div>
           </AnimatedListItem>

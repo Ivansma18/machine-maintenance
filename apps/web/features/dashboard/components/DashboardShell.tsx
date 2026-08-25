@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { AnimatedSection } from '@/components/motion/AnimatedSection';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppShell } from '@/components/layout/AppShell';
 
@@ -47,9 +48,11 @@ export function DashboardShell({
             Identifica lo que necesita atencion antes de que comience el siguiente turno.
           </p>
         </div>
-        <AppButton loading={refreshing} variant="primary" onClick={onRunAlertScan}>
-          Revisar alertas
-        </AppButton>
+        <PermissionGate permission="notifications:process-preventive">
+          <AppButton loading={refreshing} variant="primary" onClick={onRunAlertScan}>
+            Revisar alertas
+          </AppButton>
+        </PermissionGate>
       </AnimatedSection>
       {error ? <DashboardError message={error} onRetry={onRetry} /> : null}
       {children}
