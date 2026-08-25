@@ -70,7 +70,7 @@ export function MachineForm({
   }
 
   return (
-    <form className="grid gap-5" onSubmit={submit}>
+    <form autoComplete="off" className="grid gap-5" onSubmit={submit}>
       {validationError || error ? (
         <div
           className="rounded-lg border border-[#f3d7d2] bg-[#fff7f5] px-4 py-3 text-sm text-[#8e2f28]"
@@ -83,7 +83,9 @@ export function MachineForm({
         <label className="grid gap-2 text-sm font-bold text-[#17211f] sm:col-span-2">
           Machine name{' '}
           <AppInput
+            id="machine-name"
             maxLength={150}
+            name="name"
             value={values.name}
             onChange={(event) => updateValue('name', event.target.value)}
           />
@@ -92,6 +94,7 @@ export function MachineForm({
           Category{' '}
           <AppSelect
             className="w-full"
+            id="machine-category"
             placeholder="Select category"
             value={values.categoryId || undefined}
             options={categories.map((category) => ({ label: category.name, value: category.id }))}
@@ -101,7 +104,9 @@ export function MachineForm({
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
           Location{' '}
           <AppInput
+            id="machine-location"
             maxLength={150}
+            name="location"
             value={values.location}
             onChange={(event) => updateValue('location', event.target.value)}
           />
@@ -109,7 +114,9 @@ export function MachineForm({
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
           Serial number{' '}
           <AppInput
+            id="machine-serial-number"
             maxLength={100}
+            name="serialNumber"
             value={values.serialNumber}
             onChange={(event) => updateValue('serialNumber', event.target.value)}
           />
@@ -117,7 +124,9 @@ export function MachineForm({
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
           Manufacturer{' '}
           <AppInput
+            id="machine-manufacturer"
             maxLength={100}
+            name="manufacturer"
             value={values.manufacturer}
             onChange={(event) => updateValue('manufacturer', event.target.value)}
           />
@@ -125,7 +134,9 @@ export function MachineForm({
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
           Model{' '}
           <AppInput
+            id="machine-model"
             maxLength={100}
+            name="model"
             value={values.model}
             onChange={(event) => updateValue('model', event.target.value)}
           />
@@ -133,6 +144,8 @@ export function MachineForm({
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
           Installed date{' '}
           <AppInput
+            id="machine-installed-at"
+            name="installedAt"
             type="date"
             value={values.installedAt}
             onChange={(event) => updateValue('installedAt', event.target.value)}
@@ -142,6 +155,7 @@ export function MachineForm({
           Status{' '}
           <AppSelect
             className="w-full"
+            id="machine-status"
             value={values.status}
             options={statuses.map((status) => ({
               label: getMachineStatusLabel(status),
@@ -154,6 +168,7 @@ export function MachineForm({
           Criticality{' '}
           <AppSelect
             className="w-full"
+            id="machine-criticality"
             value={values.criticality}
             options={criticalities.map((criticality) => ({
               label: getMachineCriticalityLabel(criticality),

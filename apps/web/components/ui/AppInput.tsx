@@ -4,5 +4,5 @@ import type { InputProps } from 'antd';
 import { Input } from 'antd';
 
 export function AppInput(props: InputProps) {
-  return <Input {...props} />;
+  return <Input autoComplete="off" {...props} />;
 }

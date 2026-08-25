@@ -156,7 +156,7 @@ export function MachinesPage() {
       </div>
       <AppModal
         centered
-        destroyOnClose
+        destroyOnHidden
         footer={null}
         open={formOpen}
         title={editingMachine ? 'Edit machine' : 'Add machine'}

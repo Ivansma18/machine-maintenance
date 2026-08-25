@@ -46,9 +46,11 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
 
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(240px,1fr)_minmax(160px,0.7fr)_180px_180px_180px_auto]">
-      <form className="flex gap-2" onSubmit={applySearch}>
+      <form autoComplete="off" className="flex gap-2" onSubmit={applySearch}>
         <AppInput
           aria-label="Search machines"
+          id="machine-search"
+          name="search"
           placeholder="Search name, serial or manufacturer"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -59,6 +61,8 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
       </form>
       <AppInput
         aria-label="Filter by location"
+        id="machine-location-filter"
+        name="location"
         placeholder="Location"
         value={location}
         onChange={(event) => setLocation(event.target.value)}
@@ -66,6 +70,7 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
       />
       <AppSelect
         allowClear
+        id="machine-category-filter"
         className="w-full"
         aria-label="Filter by category"
         placeholder="All categories"
@@ -77,6 +82,7 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
         allowClear
         className="w-full"
         aria-label="Filter by status"
+        id="machine-status-filter"
         placeholder="All statuses"
         value={filters.status}
         options={statuses.map((status) => ({
@@ -89,6 +95,7 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
         allowClear
         className="w-full"
         aria-label="Filter by criticality"
+        id="machine-criticality-filter"
         placeholder="All criticality"
         value={filters.criticality}
         options={criticalities.map((criticality) => ({
