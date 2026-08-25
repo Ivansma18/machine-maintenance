@@ -138,6 +138,8 @@ Cada modulo backend y cada feature frontend debe mantener sus componentes, servi
 - Los hooks contienen estado, efectos, carga, errores, reintentos y acciones de la feature.
 - La capa `api/` contiene exclusivamente clientes HTTP y normalizacion de respuestas de la feature.
 - `utils/` contiene funciones puras y testeables, sin React ni acceso a infraestructura.
+- Las utilidades, componentes, hooks y contratos reutilizables entre features se declaran una sola vez en ubicaciones globales de `apps/web` (`lib/`, `components/`, `hooks/` o `types/`) y las features los consumen; no se duplican implementaciones compartidas dentro de cada feature.
+- Las carpetas `features/<feature>/utils/` se reservan para transformaciones y reglas propias del dominio de esa feature.
 - Usar nombres semanticos para componentes de pagina, como `OperationalDashboardPage`; conservar `page.tsx` solo por la convencion de Next.js.
 - Aplicar Clean Code y SOLID: responsabilidad unica, cohesion alta, bajo acoplamiento y dependencias explicitas.
 

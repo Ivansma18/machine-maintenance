@@ -27,6 +27,8 @@
 - Los archivos reservados por Next.js (`page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx` y `not-found.tsx`) mantienen sus nombres obligatorios y funcionan como entrypoints del router.
 - Un `page.tsx` solo compone una pagina descriptiva de feature; no contiene `fetch`, logica de negocio, estado complejo, helpers ni markup extenso.
 - Cada feature frontend se organiza por responsabilidad: `components/` para UI, `hooks/` para estado y efectos, `api/` para acceso HTTP, `types.ts` para contratos y `utils/` para transformaciones puras.
+- Las utilidades, componentes, hooks y contratos reutilizables entre features se declaran una sola vez en ubicaciones globales de `apps/web` (`lib/`, `components/`, `hooks/` o `types/`) y las features los consumen; no se duplican implementaciones compartidas dentro de cada feature.
+- Las carpetas `features/<feature>/utils/` se reservan para transformaciones y reglas propias del dominio de esa feature.
 - Las paginas descriptivas deben usar nombres semanticos, por ejemplo `OperationalDashboardPage`, `MachinesPage` o `MaintenancePlansPage`.
 - Los componentes reciben datos por props y comunican acciones mediante callbacks; no conocen la infraestructura HTTP.
 - Los hooks encapsulan carga, error, retry, refresh y acciones de la feature; no renderizan UI.
