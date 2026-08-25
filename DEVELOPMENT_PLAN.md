@@ -542,7 +542,7 @@ Dejar documentados los puntos de integracion y permisos necesarios para una futu
 - Documentar permisos candidatos por feature y accion.
 - Identificar operaciones que requeriran identidad real del usuario.
 - Identificar auditoria adicional necesaria para cambios y transiciones de estado.
-- Actualizar documentacion de arquitectura con las decisiones pendientes.
+- Actualizar documentacion de arquitectura con las decisiones de Auth/Roles y sus puntos de evolucion.
 
 ### Restricciones
 
@@ -571,6 +571,7 @@ Convertir las decisiones de preparacion en un contrato tecnico implementable sin
 
 ### Entregables
 
+- Documentar el contrato tecnico completo en `docs/auth-roles-technical-design.md`.
 - Confirmar login con `email` o `username` mas password.
 - Confirmar permisos globales y usuarios con multiples roles.
 - Definir modelos `User`, `Role`, `Permission`, `UserRole`, `RolePermission` y `Session`.
@@ -578,13 +579,16 @@ Convertir las decisiones de preparacion en un contrato tecnico implementable sin
 - Definir expiracion por inactividad de siete dias usando `lastSeenAt` y `expiresAt`.
 - Definir sesiones multiples y revocacion individual por sesion.
 - Definir contratos `POST /api/auth/login`, `POST /api/auth/logout` y `GET /api/auth/me`.
-- Definir variables de seed del admin inicial.
+- Definir variables de seed del admin inicial y reglas de idempotencia.
+- Definir limites entre `auth`, `authorization`, dominios y frontend global.
+- Definir errores HTTP y pruebas de contrato para las fases de implementacion.
 
 ### Criterios de aceptacion
 
 - El contrato no depende de un proveedor externo concreto.
 - El diseño permite agregar OIDC, scopes por planta y cuentas de servicio despues.
 - No se implementan login, sesiones ni permisos ejecutables en esta fase.
+- Fases 16 a 21 tienen una secuencia de implementacion y verificacion clara.
 
 ## 20. Fase 16: Prisma Auth Schema y Seed
 
