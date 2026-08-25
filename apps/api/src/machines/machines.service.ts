@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { MachineStatus, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
+import type { AuditContext } from '../audit/audit.types';
 import { CreateMachineDto } from './dto/create-machine.dto';
 import { ListMachinesDto } from './dto/list-machines.dto';
 import { UpdateMachineDto } from './dto/update-machine.dto';
@@ -14,16 +16,34 @@ const machineInclude = { category: true } as const;
 
 @Injectable()
 export class MachinesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
-  async create(dto: CreateMachineDto) {
+  async create(dto: CreateMachineDto, context?: AuditContext) {
     await this.ensureCategoryExists(dto.categoryId);
 
     try {
-      return await this.prisma.machine.create({
+      const machine = await this.prisma.machine.create({
         data: this.toCreateData(dto),
         include: machineInclude,
       });
+
+      if (context) {
+        await this.audit.record(
+          {
+            ...context,
+            action: 'machine.created',
+            entityType: 'Machine',
+            entityId: machine.id,
+            after: machine,
+          },
+          this.prisma,
+        );
+      }
+
+      return machine;
     } catch (error) {
       this.handlePrismaError(error);
     }
@@ -88,32 +108,64 @@ export class MachinesService {
     return machine;
   }
 
-  async update(id: string, dto: UpdateMachineDto) {
-    await this.findOne(id);
+  async update(id: string, dto: UpdateMachineDto, context?: AuditContext) {
+    const before = await this.findOne(id);
 
     if (dto.categoryId) {
       await this.ensureCategoryExists(dto.categoryId);
     }
 
     try {
-      return await this.prisma.machine.update({
+      const machine = await this.prisma.machine.update({
         where: { id },
         data: this.toUpdateData(dto),
         include: machineInclude,
       });
+
+      if (context) {
+        await this.audit.record(
+          {
+            ...context,
+            action: 'machine.updated',
+            entityType: 'Machine',
+            entityId: machine.id,
+            before,
+            after: machine,
+          },
+          this.prisma,
+        );
+      }
+
+      return machine;
     } catch (error) {
       this.handlePrismaError(error);
     }
   }
 
-  async deactivate(id: string) {
-    await this.findOne(id);
+  async deactivate(id: string, context?: AuditContext) {
+    const before = await this.findOne(id);
 
-    return this.prisma.machine.update({
+    const machine = await this.prisma.machine.update({
       where: { id },
       data: { status: MachineStatus.RETIRED },
       include: machineInclude,
     });
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'machine.retired',
+          entityType: 'Machine',
+          entityId: machine.id,
+          before,
+          after: machine,
+        },
+        this.prisma,
+      );
+    }
+
+    return machine;
   }
 
   private async ensureCategoryExists(categoryId: string) {

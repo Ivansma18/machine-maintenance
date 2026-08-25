@@ -1,6 +1,8 @@
 # Backlog de auditoria Auth/Roles
 
-La auditoria de negocio queda preparada para la Fase 21. No se persisten eventos en esta fase.
+La auditoria de negocio se implementa en la Fase 21 mediante `AuditEvent`. La consulta interna para administradores queda fuera de esta fase.
+
+Los eventos de identidad (`login`, `logout` y revocacion) permanecen como P1 para una iteracion posterior; esta fase audita las acciones de negocio y el job preventivo.
 
 ## Eventos prioritarios
 

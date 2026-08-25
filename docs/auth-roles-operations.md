@@ -29,6 +29,8 @@ La cookie de sesion es HttpOnly, usa `SameSite=Lax`, tiene `Path=/` y solo usa `
 - Confirmar que un usuario `Viewer` puede leer, pero no puede ejecutar acciones de escritura.
 - Confirmar que una llamada directa sin permiso recibe `403`; ocultar un boton no sustituye esta validacion.
 - Confirmar que una sesion sin cookie, revocada o expirada recibe `401`.
+- Confirmar que las mutaciones exitosas generan un `AuditEvent` con actor y `requestId`.
+- Confirmar que los snapshots de auditoria no contienen passwords, hashes, tokens ni cookies.
 
 ## Reset local
 

@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
+import { auditContextFromRequest } from '../audit/audit-context';
 import { RequirePermission } from '../authorization/decorators/require-permission.decorator';
+import type { AuthenticatedRequest } from '../authorization/types/authenticated-request.type';
 import { CreateMaintenanceLogDto } from './dto/create-maintenance-log.dto';
 import { ListMaintenanceLogsDto } from './dto/list-maintenance-logs.dto';
 import { MaintenanceLogsService } from './maintenance-logs.service';
@@ -10,8 +12,8 @@ export class MaintenanceLogsController {
 
   @Post()
   @RequirePermission('maintenance-logs:create')
-  create(@Body() dto: CreateMaintenanceLogDto) {
-    return this.maintenanceLogsService.create(dto);
+  create(@Body() dto: CreateMaintenanceLogDto, @Req() request: AuthenticatedRequest) {
+    return this.maintenanceLogsService.create(dto, auditContextFromRequest(request));
   }
 
   @Get()

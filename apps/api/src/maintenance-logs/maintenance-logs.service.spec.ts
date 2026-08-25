@@ -23,7 +23,7 @@ describe('MaintenanceLogsService', () => {
       return (operation as (tx: unknown) => unknown)(prisma);
     }),
   };
-  const service = new MaintenanceLogsService(prisma as never);
+  const service = new MaintenanceLogsService(prisma as never, { record: jest.fn() } as never);
 
   beforeEach(() => {
     jest.clearAllMocks();

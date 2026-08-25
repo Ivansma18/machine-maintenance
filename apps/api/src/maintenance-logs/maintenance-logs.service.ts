@@ -7,6 +7,8 @@ import {
   Prisma,
 } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
+import type { AuditContext } from '../audit/audit.types';
 import { CreateMaintenanceLogDto } from './dto/create-maintenance-log.dto';
 import { ListMaintenanceLogsDto } from './dto/list-maintenance-logs.dto';
 
@@ -17,9 +19,12 @@ const logInclude = {
 
 @Injectable()
 export class MaintenanceLogsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
-  async create(dto: CreateMaintenanceLogDto) {
+  async create(dto: CreateMaintenanceLogDto, context?: AuditContext) {
     const performedAt = this.toDateTime(dto.performedAt);
 
     return this.prisma.$transaction(async (tx) => {
@@ -64,7 +69,7 @@ export class MaintenanceLogsService {
         include: logInclude,
       });
 
-      const criticalNotification =
+      const criticalNotificationResult =
         dto.result === MaintenanceResult.CRITICAL_FAILURE
           ? await this.ensureCriticalNotification(tx, {
               machineId: dto.machineId,
@@ -74,8 +79,40 @@ export class MaintenanceLogsService {
               notes: dto.notes,
             })
           : null;
+      const criticalNotification = criticalNotificationResult?.notification ?? null;
+      const createdCriticalNotification = criticalNotificationResult?.created
+        ? criticalNotificationResult.notification
+        : null;
 
-      return { ...log, criticalNotification };
+      if (context && createdCriticalNotification) {
+        await this.audit.record(
+          {
+            ...context,
+            action: 'notification.urgent.created',
+            entityType: 'Notification',
+            entityId: createdCriticalNotification.id,
+            after: createdCriticalNotification,
+          },
+          tx,
+        );
+      }
+
+      const result = { ...log, criticalNotification };
+
+      if (context) {
+        await this.audit.record(
+          {
+            ...context,
+            action: 'maintenance-log.created',
+            entityType: 'MaintenanceLog',
+            entityId: log.id,
+            after: result,
+          },
+          tx,
+        );
+      }
+
+      return result;
     });
   }
 
@@ -147,10 +184,10 @@ export class MaintenanceLogsService {
     });
 
     if (existing) {
-      return existing;
+      return { notification: existing, created: false };
     }
 
-    return tx.notification.create({
+    const notification = await tx.notification.create({
       data: {
         machine: { connect: { id: input.machineId } },
         maintenancePlan: input.maintenancePlanId
@@ -164,6 +201,8 @@ export class MaintenanceLogsService {
         dueAt: input.performedAt,
       },
     });
+
+    return { notification, created: true };
   }
 
   private toDateTime(value: string) {

@@ -13,7 +13,7 @@ describe('MaintenancePlansService', () => {
     },
     $transaction: jest.fn((operations: Promise<unknown>[]) => Promise.all(operations)),
   };
-  const service = new MaintenancePlansService(prisma as never);
+  const service = new MaintenancePlansService(prisma as never, { record: jest.fn() } as never);
 
   beforeEach(() => {
     jest.clearAllMocks();

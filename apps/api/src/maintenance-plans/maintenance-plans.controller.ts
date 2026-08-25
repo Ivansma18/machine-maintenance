@@ -1,5 +1,17 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
+import { auditContextFromRequest } from '../audit/audit-context';
 import { RequirePermission } from '../authorization/decorators/require-permission.decorator';
+import type { AuthenticatedRequest } from '../authorization/types/authenticated-request.type';
 import { CreateMaintenancePlanDto } from './dto/create-maintenance-plan.dto';
 import { ListMaintenancePlansDto } from './dto/list-maintenance-plans.dto';
 import { UpdateMaintenancePlanDto } from './dto/update-maintenance-plan.dto';
@@ -11,8 +23,8 @@ export class MaintenancePlansController {
 
   @Post()
   @RequirePermission('maintenance-plans:create')
-  create(@Body() dto: CreateMaintenancePlanDto) {
-    return this.maintenancePlansService.create(dto);
+  create(@Body() dto: CreateMaintenancePlanDto, @Req() request: AuthenticatedRequest) {
+    return this.maintenancePlansService.create(dto, auditContextFromRequest(request));
   }
 
   @Get()
@@ -23,14 +35,20 @@ export class MaintenancePlansController {
 
   @Patch(':id/activate')
   @RequirePermission('maintenance-plans:activate')
-  activate(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.maintenancePlansService.activate(id);
+  activate(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.maintenancePlansService.activate(id, auditContextFromRequest(request));
   }
 
   @Patch(':id/deactivate')
   @RequirePermission('maintenance-plans:deactivate')
-  deactivate(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.maintenancePlansService.deactivate(id);
+  deactivate(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.maintenancePlansService.deactivate(id, auditContextFromRequest(request));
   }
 
   @Get(':id')
@@ -44,7 +62,8 @@ export class MaintenancePlansController {
   update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: UpdateMaintenancePlanDto,
+    @Req() request: AuthenticatedRequest,
   ) {
-    return this.maintenancePlansService.update(id, dto);
+    return this.maintenancePlansService.update(id, dto, auditContextFromRequest(request));
   }
 }

@@ -26,7 +26,7 @@ describe('NotificationsService', () => {
       return (operation as (tx: unknown) => unknown)(prisma);
     }),
   };
-  const service = new NotificationsService(prisma as never);
+  const service = new NotificationsService(prisma as never, { record: jest.fn() } as never);
 
   const plan = {
     id: 'plan-id',

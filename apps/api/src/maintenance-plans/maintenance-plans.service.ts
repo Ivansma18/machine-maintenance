@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { MaintenanceType, Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
+import type { AuditContext } from '../audit/audit.types';
 import { CreateMaintenancePlanDto } from './dto/create-maintenance-plan.dto';
 import { ListMaintenancePlansDto } from './dto/list-maintenance-plans.dto';
 import { UpdateMaintenancePlanDto } from './dto/update-maintenance-plan.dto';
@@ -26,9 +28,12 @@ const planInclude = {
 
 @Injectable()
 export class MaintenancePlansService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
-  async create(dto: CreateMaintenancePlanDto) {
+  async create(dto: CreateMaintenancePlanDto, context?: AuditContext) {
     await this.ensureMachineExists(dto.machineId);
     const isActive = dto.isActive ?? true;
 
@@ -58,7 +63,22 @@ export class MaintenancePlansService {
       include: planInclude,
     });
 
-    return this.withSchedule(plan);
+    const result = this.withSchedule(plan);
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'maintenance-plan.created',
+          entityType: 'MaintenancePlan',
+          entityId: plan.id,
+          after: result,
+        },
+        this.prisma,
+      );
+    }
+
+    return result;
   }
 
   async findAll(query: ListMaintenancePlansDto) {
@@ -103,7 +123,7 @@ export class MaintenancePlansService {
     return this.withSchedule(plan);
   }
 
-  async update(id: string, dto: UpdateMaintenancePlanDto) {
+  async update(id: string, dto: UpdateMaintenancePlanDto, context?: AuditContext) {
     const current = await this.findPlanRecord(id);
     const next = {
       machineId: current.machineId,
@@ -130,10 +150,26 @@ export class MaintenancePlansService {
       include: planInclude,
     });
 
-    return this.withSchedule(plan);
+    const result = this.withSchedule(plan);
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'maintenance-plan.updated',
+          entityType: 'MaintenancePlan',
+          entityId: plan.id,
+          before: this.withSchedule(current),
+          after: result,
+        },
+        this.prisma,
+      );
+    }
+
+    return result;
   }
 
-  async activate(id: string) {
+  async activate(id: string, context?: AuditContext) {
     const current = await this.findPlanRecord(id);
 
     await this.ensureNoEquivalentActivePlan(current.machineId, current, id);
@@ -144,11 +180,27 @@ export class MaintenancePlansService {
       include: planInclude,
     });
 
-    return this.withSchedule(plan);
+    const result = this.withSchedule(plan);
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'maintenance-plan.activated',
+          entityType: 'MaintenancePlan',
+          entityId: plan.id,
+          before: this.withSchedule(current),
+          after: result,
+        },
+        this.prisma,
+      );
+    }
+
+    return result;
   }
 
-  async deactivate(id: string) {
-    await this.findPlanRecord(id);
+  async deactivate(id: string, context?: AuditContext) {
+    const current = await this.findPlanRecord(id);
 
     const plan = await this.prisma.maintenancePlan.update({
       where: { id },
@@ -156,7 +208,23 @@ export class MaintenancePlansService {
       include: planInclude,
     });
 
-    return this.withSchedule(plan);
+    const result = this.withSchedule(plan);
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'maintenance-plan.deactivated',
+          entityType: 'MaintenancePlan',
+          entityId: plan.id,
+          before: this.withSchedule(current),
+          after: result,
+        },
+        this.prisma,
+      );
+    }
+
+    return result;
   }
 
   private async findPlanRecord(id: string) {
