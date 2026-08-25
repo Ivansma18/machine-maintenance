@@ -1,10 +1,10 @@
 type OperationsSidebarProps = { activeHref: string };
 
 const navigation = [
-  { href: '/', label: 'Overview' },
-  { href: '/machines', label: 'Machines' },
-  { href: '/maintenance-plans', label: 'Maintenance plan' },
-  { href: '/notifications', label: 'Alerts' },
+  { href: '/', label: 'Resumen' },
+  { href: '/machines', label: 'Maquinas' },
+  { href: '/maintenance-plans', label: 'Plan preventivo' },
+  { href: '/notifications', label: 'Alertas' },
 ];
 
 export function OperationsSidebar({ activeHref }: OperationsSidebarProps) {
@@ -17,12 +17,12 @@ export function OperationsSidebar({ activeHref }: OperationsSidebarProps) {
         <div>
           <p className="m-0 text-sm font-black tracking-[0.18em] text-[#17211f]">PANTRY</p>
           <p className="m-0 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#68736f]">
-            Maintenance OS
+            Sistema de mantenimiento
           </p>
         </div>
       </div>
-      <nav className="flex flex-1 flex-col gap-2" aria-label="Main navigation">
-        <p className="eyebrow mb-2 px-3">Workspace</p>
+      <nav className="flex flex-1 flex-col gap-2" aria-label="Navegacion principal">
+        <p className="eyebrow mb-2 px-3">Espacio de trabajo</p>
         {navigation.map((item) => (
           <a
             className={
@@ -38,10 +38,10 @@ export function OperationsSidebar({ activeHref }: OperationsSidebarProps) {
         ))}
       </nav>
       <div className="rounded-xl border border-[#dfe4df] bg-white p-4">
-        <p className="eyebrow">System pulse</p>
-        <p className="mb-3 mt-2 text-sm font-bold text-[#17211f]">Operations connected</p>
+        <p className="eyebrow">Estado del sistema</p>
+        <p className="mb-3 mt-2 text-sm font-bold text-[#17211f]">Operaciones conectadas</p>
         <div className="flex items-center gap-2 text-xs text-[#68736f]">
-          <span className="h-2 w-2 rounded-full bg-[#668875]" /> Live API summary
+          <span className="h-2 w-2 rounded-full bg-[#668875]" /> API en vivo
         </div>
       </div>
     </aside>

@@ -12,7 +12,11 @@ import type {
   MachineFilters as Filters,
   MachineStatus,
 } from '../types';
-import { getMachineCriticalityLabel, getMachineStatusLabel } from '../utils/machineFormatters';
+import {
+  getMachineCategoryLabel,
+  getMachineCriticalityLabel,
+  getMachineStatusLabel,
+} from '../utils/machineFormatters';
 
 type MachineFiltersProps = {
   categories: MachineCategory[];
@@ -48,22 +52,22 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
     <div className="grid gap-3 lg:grid-cols-[minmax(240px,1fr)_minmax(160px,0.7fr)_180px_180px_180px_auto]">
       <form autoComplete="off" className="flex gap-2" onSubmit={applySearch}>
         <AppInput
-          aria-label="Search machines"
+          aria-label="Buscar maquinas"
           id="machine-search"
           name="search"
-          placeholder="Search name, serial or manufacturer"
+          placeholder="Buscar por nombre, serie o fabricante"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
         <AppButton htmlType="submit" variant="secondary">
-          Search
+          Buscar
         </AppButton>
       </form>
       <AppInput
-        aria-label="Filter by location"
+        aria-label="Filtrar por ubicacion"
         id="machine-location-filter"
         name="location"
-        placeholder="Location"
+        placeholder="Ubicacion"
         value={location}
         onChange={(event) => setLocation(event.target.value)}
         onPressEnter={() => onChange({ location })}
@@ -72,18 +76,21 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
         allowClear
         id="machine-category-filter"
         className="w-full"
-        aria-label="Filter by category"
-        placeholder="All categories"
+        aria-label="Filtrar por categoria"
+        placeholder="Todas las categorias"
         value={filters.categoryId}
-        options={categories.map((category) => ({ label: category.name, value: category.id }))}
+        options={categories.map((category) => ({
+          label: getMachineCategoryLabel(category.name),
+          value: category.id,
+        }))}
         onChange={(value) => onChange({ categoryId: value })}
       />
       <AppSelect
         allowClear
         className="w-full"
-        aria-label="Filter by status"
+        aria-label="Filtrar por estado"
         id="machine-status-filter"
-        placeholder="All statuses"
+        placeholder="Todos los estados"
         value={filters.status}
         options={statuses.map((status) => ({
           label: getMachineStatusLabel(status),
@@ -94,9 +101,9 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
       <AppSelect
         allowClear
         className="w-full"
-        aria-label="Filter by criticality"
+        aria-label="Filtrar por criticidad"
         id="machine-criticality-filter"
-        placeholder="All criticality"
+        placeholder="Toda criticidad"
         value={filters.criticality}
         options={criticalities.map((criticality) => ({
           label: getMachineCriticalityLabel(criticality),
@@ -105,7 +112,7 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
         onChange={(value) => onChange({ criticality: value })}
       />
       <AppButton variant="quiet" onClick={reset}>
-        Clear
+        Limpiar
       </AppButton>
     </div>
   );

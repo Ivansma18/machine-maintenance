@@ -21,23 +21,25 @@ export function MachinesContent({
 }: MachinesContentProps) {
   return (
     <AppPanel
-      title="Machine register"
-      eyebrow="Production assets"
-      extra={<AppButton onClick={onCreate}>Add machine</AppButton>}
+      title="Registro de maquinas"
+      eyebrow="Activos de produccion"
+      extra={<AppButton onClick={onCreate}>Agregar maquina</AppButton>}
     >
       <div className="flex items-center justify-between border-b border-[#dfe4df] px-5 py-4">
         <p className="m-0 text-sm text-[#68736f]">
-          <strong className="text-[#17211f]">{total}</strong> machines in register
+          <strong className="text-[#17211f]">{total}</strong> maquinas registradas
         </p>
-        <p className="eyebrow">Live inventory</p>
+        <p className="eyebrow">Inventario en vivo</p>
       </div>
       {machines.length ? (
         <MachineList machines={machines} onEdit={onEdit} onRetire={onRetire} />
       ) : (
         <div className="p-10 text-center">
-          <p className="m-0 text-base font-black text-[#17211f]">No machines match these filters</p>
+          <p className="m-0 text-base font-black text-[#17211f]">
+            Ninguna maquina coincide con los filtros
+          </p>
           <p className="mb-0 mt-2 text-sm text-[#68736f]">
-            Clear the filters or add the first machine to this register.
+            Limpia los filtros o agrega la primera maquina a este registro.
           </p>
         </div>
       )}

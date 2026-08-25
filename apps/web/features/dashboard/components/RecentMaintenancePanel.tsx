@@ -4,13 +4,18 @@ import { AnimatedListItem } from '@/components/motion/AnimatedListItem';
 import { AppPanel } from '@/components/ui/AppPanel';
 import { AppTag } from '@/components/ui/AppTag';
 
-import { formatDashboardDate, getResultLabel, getResultTone } from '../utils/dashboardFormatters';
+import {
+  formatDashboardDate,
+  getMaintenanceTypeLabel,
+  getResultLabel,
+  getResultTone,
+} from '../utils/dashboardFormatters';
 import type { DashboardSummary } from '../types';
 
 export function RecentMaintenancePanel({ logs }: { logs: DashboardSummary['recentLogs'] }) {
   return (
     <AnimatedSection id="alerts" delay={0.2}>
-      <AppPanel title="Recent maintenance" eyebrow="Latest activity">
+      <AppPanel title="Mantenimientos recientes" eyebrow="Ultima actividad">
         <AnimatedList>
           <div className="divide-y divide-[#dfe4df]">
             {logs.length ? (
@@ -24,7 +29,7 @@ export function RecentMaintenancePanel({ logs }: { logs: DashboardSummary['recen
                       {log.machine.name}
                     </p>
                     <p className="m-0 mt-1 truncate text-xs text-[#68736f]">
-                      {log.maintenancePlan?.name ?? `${log.type.toLowerCase()} maintenance`} ·{' '}
+                      {log.maintenancePlan?.name ?? getMaintenanceTypeLabel(log.type)} ·{' '}
                       {formatDashboardDate(log.performedAt)}
                     </p>
                   </div>
@@ -33,7 +38,7 @@ export function RecentMaintenancePanel({ logs }: { logs: DashboardSummary['recen
               ))
             ) : (
               <div className="p-6 text-sm text-[#68736f]">
-                No maintenance has been recorded yet.
+                Todavia no hay mantenimientos registrados.
               </div>
             )}
           </div>

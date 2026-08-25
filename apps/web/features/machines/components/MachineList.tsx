@@ -6,6 +6,7 @@ import { AppTag } from '@/components/ui/AppTag';
 import type { Machine } from '../types';
 import {
   formatMachineDate,
+  getMachineCategoryLabel,
   getMachineCriticalityLabel,
   getMachineCriticalityTone,
   getMachineStatusLabel,
@@ -30,11 +31,12 @@ export function MachineList({ machines, onEdit, onRetire }: MachineListProps) {
             <div className="min-w-0">
               <p className="m-0 truncate text-base font-black text-[#17211f]">{machine.name}</p>
               <p className="m-0 mt-1 truncate text-xs text-[#68736f]">
-                {machine.category.name} · {machine.serialNumber ?? 'No serial number'}
+                {getMachineCategoryLabel(machine.category.name)} ·{' '}
+                {machine.serialNumber ?? 'Sin numero de serie'}
               </p>
             </div>
             <div>
-              <p className="eyebrow">Location</p>
+              <p className="eyebrow">Ubicacion</p>
               <p className="m-0 mt-1 text-sm text-[#68736f]">{machine.location}</p>
             </div>
             <div className="flex gap-2 lg:flex-col lg:items-start">
@@ -46,18 +48,18 @@ export function MachineList({ machines, onEdit, onRetire }: MachineListProps) {
               </AppTag>
             </div>
             <div>
-              <p className="eyebrow">Installed</p>
+              <p className="eyebrow">Instalada</p>
               <p className="m-0 mt-1 text-sm text-[#68736f]">
                 {formatMachineDate(machine.installedAt)}
               </p>
             </div>
             <div className="flex justify-end gap-2">
               <AppButton variant="quiet" onClick={() => onEdit(machine)}>
-                Edit
+                Editar
               </AppButton>
               {machine.status !== 'RETIRED' ? (
                 <AppButton variant="danger" onClick={() => onRetire(machine)}>
-                  Retire
+                  Retirar
                 </AppButton>
               ) : null}
             </div>

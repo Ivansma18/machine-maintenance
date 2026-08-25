@@ -37,7 +37,7 @@ export function useMachines() {
       .then(setCategories)
       .catch((requestError: unknown) => {
         if (!(requestError instanceof DOMException && requestError.name === 'AbortError'))
-          setError('Machine categories could not be loaded.');
+          setError('No se pudieron cargar las categorias de maquinas.');
       })
       .finally(() => {
         if (!controller.signal.aborted) setCategoriesLoading(false);
@@ -53,7 +53,7 @@ export function useMachines() {
       .then(setResult)
       .catch((requestError: unknown) => {
         if (!(requestError instanceof DOMException && requestError.name === 'AbortError'))
-          setError('Machines could not be loaded. Check the API and try again.');
+          setError('No se pudieron cargar las maquinas. Verifica la API e intenta de nuevo.');
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
@@ -74,7 +74,7 @@ export function useMachines() {
       setRefreshKey((value) => value + 1);
     } catch (requestError) {
       setActionError(
-        requestError instanceof Error ? requestError.message : 'Machine could not be saved.',
+        requestError instanceof Error ? requestError.message : 'No se pudo guardar la maquina.',
       );
       throw requestError;
     } finally {
@@ -90,7 +90,7 @@ export function useMachines() {
       setRefreshKey((value) => value + 1);
     } catch (requestError) {
       setActionError(
-        requestError instanceof Error ? requestError.message : 'Machine could not be retired.',
+        requestError instanceof Error ? requestError.message : 'No se pudo retirar la maquina.',
       );
       throw requestError;
     } finally {

@@ -1,7 +1,7 @@
 import type { DashboardMachineDistribution, DashboardResult, DashboardSummary } from '../types';
 
 export function formatDashboardDate(value: string) {
-  return new Intl.DateTimeFormat('en', {
+  return new Intl.DateTimeFormat('es-MX', {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
@@ -17,16 +17,31 @@ export function getResultTone(result: DashboardResult) {
 }
 
 export function getResultLabel(result: DashboardResult) {
-  return result.replaceAll('_', ' ').toLowerCase();
+  const labels: Record<DashboardResult, string> = {
+    OK: 'Correcto',
+    NEEDS_FOLLOW_UP: 'Requiere seguimiento',
+    FAILED: 'Fallido',
+    CRITICAL_FAILURE: 'Fallo critico',
+  };
+  return labels[result];
+}
+
+export function getMaintenanceTypeLabel(type: string) {
+  const labels: Record<string, string> = {
+    PREVENTIVE: 'mantenimiento preventivo',
+    CORRECTIVE: 'mantenimiento correctivo',
+    INSPECTION: 'inspeccion',
+  };
+  return labels[type] ?? 'mantenimiento';
 }
 
 export function getMachineDistribution(
   machines: DashboardSummary['machines'],
 ): DashboardMachineDistribution[] {
   return [
-    { label: 'Active', count: machines.active, color: '#668875' },
-    { label: 'Under maintenance', count: machines.underMaintenance, color: '#d95b4f' },
-    { label: 'Inactive', count: machines.inactive, color: '#9da7a2' },
-    { label: 'Retired', count: machines.retired, color: '#c8cfca' },
+    { label: 'Activas', count: machines.active, color: '#668875' },
+    { label: 'En mantenimiento', count: machines.underMaintenance, color: '#d95b4f' },
+    { label: 'Inactivas', count: machines.inactive, color: '#9da7a2' },
+    { label: 'Retiradas', count: machines.retired, color: '#c8cfca' },
   ];
 }

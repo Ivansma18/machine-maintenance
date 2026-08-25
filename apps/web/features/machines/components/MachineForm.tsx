@@ -13,7 +13,11 @@ import type {
   MachineCriticality,
   MachineStatus,
 } from '../types';
-import { getMachineCriticalityLabel, getMachineStatusLabel } from '../utils/machineFormatters';
+import {
+  getMachineCategoryLabel,
+  getMachineCriticalityLabel,
+  getMachineStatusLabel,
+} from '../utils/machineFormatters';
 
 type MachineFormProps = {
   machine?: Machine;
@@ -62,7 +66,7 @@ export function MachineForm({
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!values.categoryId || !values.name.trim() || !values.location.trim()) {
-      setValidationError('Category, name and location are required.');
+      setValidationError('La categoria, el nombre y la ubicacion son obligatorios.');
       return;
     }
     setValidationError(null);
@@ -81,7 +85,7 @@ export function MachineForm({
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-2 text-sm font-bold text-[#17211f] sm:col-span-2">
-          Machine name{' '}
+          Nombre de la maquina{' '}
           <AppInput
             id="machine-name"
             maxLength={150}
@@ -91,18 +95,21 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Category{' '}
+          Categoria{' '}
           <AppSelect
             className="w-full"
             id="machine-category"
-            placeholder="Select category"
+            placeholder="Selecciona una categoria"
             value={values.categoryId || undefined}
-            options={categories.map((category) => ({ label: category.name, value: category.id }))}
+            options={categories.map((category) => ({
+              label: getMachineCategoryLabel(category.name),
+              value: category.id,
+            }))}
             onChange={(value) => updateValue('categoryId', value)}
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Location{' '}
+          Ubicacion{' '}
           <AppInput
             id="machine-location"
             maxLength={150}
@@ -112,7 +119,7 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Serial number{' '}
+          Numero de serie{' '}
           <AppInput
             id="machine-serial-number"
             maxLength={100}
@@ -122,7 +129,7 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Manufacturer{' '}
+          Fabricante{' '}
           <AppInput
             id="machine-manufacturer"
             maxLength={100}
@@ -132,7 +139,7 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Model{' '}
+          Modelo{' '}
           <AppInput
             id="machine-model"
             maxLength={100}
@@ -142,7 +149,7 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Installed date{' '}
+          Fecha de instalacion{' '}
           <AppInput
             id="machine-installed-at"
             name="installedAt"
@@ -152,7 +159,7 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Status{' '}
+          Estado{' '}
           <AppSelect
             className="w-full"
             id="machine-status"
@@ -165,7 +172,7 @@ export function MachineForm({
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">
-          Criticality{' '}
+          Criticidad{' '}
           <AppSelect
             className="w-full"
             id="machine-criticality"
@@ -180,10 +187,10 @@ export function MachineForm({
       </div>
       <div className="flex justify-end gap-3 border-t border-[#dfe4df] pt-5">
         <AppButton variant="secondary" htmlType="button" onClick={onCancel}>
-          Cancel
+          Cancelar
         </AppButton>
         <AppButton htmlType="submit" loading={loading}>
-          {machine ? 'Save changes' : 'Add machine'}
+          {machine ? 'Guardar cambios' : 'Agregar maquina'}
         </AppButton>
       </div>
     </form>

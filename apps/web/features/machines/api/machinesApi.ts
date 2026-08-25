@@ -14,9 +14,22 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
       message?: string | string[];
     } | null;
     const message = Array.isArray(body?.message) ? body.message.join(', ') : body?.message;
-    throw new Error(message ?? `Request failed with status ${response.status}`);
+    throw new Error(
+      localizeMachineError(message) ?? `La solicitud fallo con el estado ${response.status}`,
+    );
   }
   return response.json() as Promise<T>;
+}
+
+function localizeMachineError(message?: string) {
+  if (!message) return undefined;
+  if (message.includes('serial number already exists'))
+    return 'Ya existe una maquina con ese numero de serie.';
+  if (message.includes('category') && message.includes('does not exist'))
+    return 'La categoria seleccionada no existe.';
+  if (message.includes('Machine') && message.includes('not found'))
+    return 'La maquina no fue encontrada.';
+  return message;
 }
 
 function toPayload(values: MachineFormValues) {

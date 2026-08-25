@@ -9,11 +9,11 @@ export function DashboardError({ message, onRetry }: DashboardErrorProps) {
       role="alert"
     >
       <div>
-        <p className="m-0 text-sm font-bold text-[#8e2f28]">Dashboard unavailable</p>
+        <p className="m-0 text-sm font-bold text-[#8e2f28]">Resumen no disponible</p>
         <p className="m-0 mt-1 text-xs leading-5 text-[#a65a52]">{message}</p>
       </div>
       <AppButton variant="secondary" onClick={onRetry}>
-        Retry
+        Reintentar
       </AppButton>
     </div>
   );

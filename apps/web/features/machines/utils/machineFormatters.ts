@@ -1,17 +1,23 @@
 import type { MachineCriticality, MachineStatus } from '../types';
 
 const statusLabels: Record<MachineStatus, string> = {
-  ACTIVE: 'Active',
-  INACTIVE: 'Inactive',
-  UNDER_MAINTENANCE: 'Under maintenance',
-  RETIRED: 'Retired',
+  ACTIVE: 'Activa',
+  INACTIVE: 'Inactiva',
+  UNDER_MAINTENANCE: 'En mantenimiento',
+  RETIRED: 'Retirada',
 };
 
 const criticalityLabels: Record<MachineCriticality, string> = {
-  LOW: 'Low',
-  MEDIUM: 'Medium',
-  HIGH: 'High',
-  CRITICAL: 'Critical',
+  LOW: 'Baja',
+  MEDIUM: 'Media',
+  HIGH: 'Alta',
+  CRITICAL: 'Critica',
+};
+
+const categoryLabels: Record<string, string> = {
+  Oven: 'Horno',
+  Mixer: 'Mezcladora',
+  DoughKneader: 'Amasadora',
 };
 
 export function getMachineStatusLabel(status: MachineStatus) {
@@ -20,6 +26,10 @@ export function getMachineStatusLabel(status: MachineStatus) {
 
 export function getMachineCriticalityLabel(criticality: MachineCriticality) {
   return criticalityLabels[criticality];
+}
+
+export function getMachineCategoryLabel(name: string) {
+  return categoryLabels[name] ?? name;
 }
 
 export function getMachineStatusTone(status: MachineStatus) {
@@ -37,8 +47,10 @@ export function getMachineCriticalityTone(criticality: MachineCriticality) {
 }
 
 export function formatMachineDate(value: string | null) {
-  if (!value) return 'Not recorded';
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(
-    new Date(value),
-  );
+  if (!value) return 'No registrada';
+  return new Intl.DateTimeFormat('es-MX', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value));
 }

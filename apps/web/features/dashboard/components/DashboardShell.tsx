@@ -32,13 +32,13 @@ export function DashboardShell({
           <main className="px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-12" id="overview">
             <AnimatedSection className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div>
-                <p className="eyebrow">Operational pulse</p>
+                <p className="eyebrow">Estado operativo</p>
                 <p className="mb-0 mt-3 max-w-xl text-sm leading-6 text-[#68736f]">
-                  See what needs attention before the next bakery shift starts.
+                  Identifica lo que necesita atencion antes de que comience el siguiente turno.
                 </p>
               </div>
               <AppButton loading={refreshing} variant="primary" onClick={onRunAlertScan}>
-                Run alert scan
+                Revisar alertas
               </AppButton>
             </AnimatedSection>
             {error ? <DashboardError message={error} onRetry={onRetry} /> : null}
