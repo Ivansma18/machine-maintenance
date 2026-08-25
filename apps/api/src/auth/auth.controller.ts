@@ -16,6 +16,7 @@ import { AUTH_SESSION_COOKIE } from './auth.constants';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import type { AuthenticatedIdentity } from './types/auth.types';
+import { Public } from '../authorization/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -35,6 +36,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) response: Response) {
     const session = await this.authService.login(dto.identifier, dto.password);
@@ -45,6 +47,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @Public()
   @HttpCode(HttpStatus.OK)
   async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     await this.authService.logout(request.cookies?.[this.cookieName]);
