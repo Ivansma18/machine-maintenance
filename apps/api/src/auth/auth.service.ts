@@ -34,6 +34,7 @@ const publicUserSelect = {
 
 const identityUserSelect = {
   ...publicUserSelect,
+  isActive: true,
   roles: {
     select: {
       role: {
@@ -127,13 +128,21 @@ export class AuthService {
       return null;
     }
 
-    await this.prisma.session.update({
-      where: { id: session.id },
+    const renewed = await this.prisma.session.updateMany({
+      where: {
+        id: session.id,
+        revokedAt: null,
+        expiresAt: { gt: now },
+      },
       data: {
         lastSeenAt: now,
         expiresAt: this.expirationFrom(now),
       },
     });
+
+    if (renewed.count !== 1) {
+      return null;
+    }
 
     return this.buildIdentity(session.userId, session.id);
   }
@@ -158,7 +167,7 @@ export class AuthService {
       select: identityUserSelect,
     });
 
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid session');
     }
 
@@ -204,7 +213,18 @@ export class AuthService {
     const r = Number(rValue);
     const p = Number(pValue);
 
-    if (!Number.isInteger(N) || !Number.isInteger(r) || !Number.isInteger(p)) {
+    if (
+      !Number.isInteger(N) ||
+      !Number.isInteger(r) ||
+      !Number.isInteger(p) ||
+      N < 1_024 ||
+      N > 1_048_576 ||
+      (N & (N - 1)) !== 0 ||
+      r < 1 ||
+      r > 32 ||
+      p < 1 ||
+      p > 16
+    ) {
       return false;
     }
 
