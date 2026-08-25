@@ -16,7 +16,7 @@ describe('MachinesService', () => {
     },
     $transaction: jest.fn((operations: Promise<unknown>[]) => Promise.all(operations)),
   };
-  const service = new MachinesService(prisma as never);
+  const service = new MachinesService(prisma as never, { record: jest.fn() } as never);
 
   beforeEach(() => {
     jest.clearAllMocks();

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { AuthModule } from './auth/auth.module';
+import { AuditModule } from './audit/audit.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
@@ -20,6 +21,7 @@ import { PrismaModule } from './prisma/prisma.module';
     }),
     ScheduleModule.forRoot(),
     AuthModule,
+    AuditModule,
     AuthorizationModule,
     DashboardModule,
     PrismaModule,

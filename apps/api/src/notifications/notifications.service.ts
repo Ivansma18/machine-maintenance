@@ -9,6 +9,8 @@ import {
   Prisma,
 } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
+import type { AuditContext } from '../audit/audit.types';
 import { ListNotificationsDto } from './dto/list-notifications.dto';
 import {
   calculatePlanSchedule,
@@ -35,7 +37,10 @@ const planInclude = {
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   async findAll(query: ListNotificationsDto) {
     const where: Prisma.NotificationWhereInput = {
@@ -82,7 +87,7 @@ export class NotificationsService {
     return notification;
   }
 
-  async processPreventiveNotifications(now = new Date()) {
+  async processPreventiveNotifications(now = new Date(), context?: AuditContext) {
     const plans = await this.prisma.maintenancePlan.findMany({
       where: { isActive: true },
       include: planInclude,
@@ -123,7 +128,7 @@ export class NotificationsService {
               dueAtChanged;
 
             if (notificationChanged) {
-              await tx.notification.update({
+              const updatedNotification = await tx.notification.update({
                 where: { id: existing.id },
                 data: {
                   severity: current.severity,
@@ -132,10 +137,24 @@ export class NotificationsService {
                   dueAt: schedule.nextDueAt,
                 },
               });
+
+              if (context) {
+                await this.audit.record(
+                  {
+                    ...context,
+                    action: 'notification.preventive.updated',
+                    entityType: 'Notification',
+                    entityId: updatedNotification.id,
+                    before: existing,
+                    after: updatedNotification,
+                  },
+                  tx,
+                );
+              }
               updated += 1;
             }
           } else {
-            await tx.notification.create({
+            const createdNotification = await tx.notification.create({
               data: {
                 machine: { connect: { id: plan.machine.id } },
                 maintenancePlan: { connect: { id: plan.id } },
@@ -147,6 +166,19 @@ export class NotificationsService {
                 dueAt: schedule.nextDueAt,
               },
             });
+
+            if (context) {
+              await this.audit.record(
+                {
+                  ...context,
+                  action: 'notification.preventive.created',
+                  entityType: 'Notification',
+                  entityId: createdNotification.id,
+                  after: createdNotification,
+                },
+                tx,
+              );
+            }
             created += 1;
           }
 
@@ -155,18 +187,64 @@ export class NotificationsService {
             .map((notification) => notification.id);
 
           if (staleIds.length > 0) {
+            if (!context) {
+              const closed = await tx.notification.updateMany({
+                where: { id: { in: staleIds } },
+                data: { status: NotificationStatus.RESOLVED, resolvedAt: now },
+              });
+              resolved += closed.count;
+            } else {
+              for (const staleNotification of openNotifications.filter((notification) =>
+                staleIds.includes(notification.id),
+              )) {
+                const resolvedNotification = await tx.notification.update({
+                  where: { id: staleNotification.id },
+                  data: { status: NotificationStatus.RESOLVED, resolvedAt: now },
+                });
+
+                await this.audit.record(
+                  {
+                    ...context,
+                    action: 'notification.preventive.resolved',
+                    entityType: 'Notification',
+                    entityId: resolvedNotification.id,
+                    before: staleNotification,
+                    after: resolvedNotification,
+                  },
+                  tx,
+                );
+                resolved += 1;
+              }
+            }
+          }
+        } else if (openNotifications.length > 0) {
+          if (!context) {
             const closed = await tx.notification.updateMany({
-              where: { id: { in: staleIds } },
+              where: { id: { in: openNotifications.map((notification) => notification.id) } },
               data: { status: NotificationStatus.RESOLVED, resolvedAt: now },
             });
             resolved += closed.count;
+          } else {
+            for (const openNotification of openNotifications) {
+              const resolvedNotification = await tx.notification.update({
+                where: { id: openNotification.id },
+                data: { status: NotificationStatus.RESOLVED, resolvedAt: now },
+              });
+
+              await this.audit.record(
+                {
+                  ...context,
+                  action: 'notification.preventive.resolved',
+                  entityType: 'Notification',
+                  entityId: resolvedNotification.id,
+                  before: openNotification,
+                  after: resolvedNotification,
+                },
+                tx,
+              );
+              resolved += 1;
+            }
           }
-        } else if (openNotifications.length > 0) {
-          const closed = await tx.notification.updateMany({
-            where: { id: { in: openNotifications.map((notification) => notification.id) } },
-            data: { status: NotificationStatus.RESOLVED, resolvedAt: now },
-          });
-          resolved += closed.count;
         }
 
         return { created, updated, resolved };
@@ -177,28 +255,46 @@ export class NotificationsService {
       result.resolved += outcome.resolved;
     }
 
+    if (context) {
+      await this.audit.record({
+        ...context,
+        action: 'notifications.preventive.processed',
+        entityType: 'PreventiveNotificationJob',
+        after: result,
+      });
+    }
+
     return result;
   }
 
-  async acknowledge(id: string) {
-    return this.transition(id, NotificationStatus.ACKNOWLEDGED, [NotificationStatus.OPEN]);
+  async acknowledge(id: string, context?: AuditContext) {
+    return this.transition(id, NotificationStatus.ACKNOWLEDGED, [NotificationStatus.OPEN], context);
   }
 
-  async resolve(id: string) {
-    return this.transition(id, NotificationStatus.RESOLVED, [
-      NotificationStatus.OPEN,
-      NotificationStatus.ACKNOWLEDGED,
-    ]);
+  async resolve(id: string, context?: AuditContext) {
+    return this.transition(
+      id,
+      NotificationStatus.RESOLVED,
+      [NotificationStatus.OPEN, NotificationStatus.ACKNOWLEDGED],
+      context,
+    );
   }
 
-  async dismiss(id: string) {
-    return this.transition(id, NotificationStatus.DISMISSED, [
-      NotificationStatus.OPEN,
-      NotificationStatus.ACKNOWLEDGED,
-    ]);
+  async dismiss(id: string, context?: AuditContext) {
+    return this.transition(
+      id,
+      NotificationStatus.DISMISSED,
+      [NotificationStatus.OPEN, NotificationStatus.ACKNOWLEDGED],
+      context,
+    );
   }
 
-  private async transition(id: string, status: NotificationStatus, allowed: NotificationStatus[]) {
+  private async transition(
+    id: string,
+    status: NotificationStatus,
+    allowed: NotificationStatus[],
+    context?: AuditContext,
+  ) {
     const notification = await this.prisma.notification.findUnique({ where: { id } });
 
     if (!notification) {
@@ -211,7 +307,7 @@ export class NotificationsService {
       );
     }
 
-    return this.prisma.notification.update({
+    const updated = await this.prisma.notification.update({
       where: { id },
       data: {
         status,
@@ -222,6 +318,22 @@ export class NotificationsService {
       },
       include: notificationInclude,
     });
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: `notification.${status.toLowerCase()}`,
+          entityType: 'Notification',
+          entityId: updated.id,
+          before: notification,
+          after: updated,
+        },
+        this.prisma,
+      );
+    }
+
+    return updated;
   }
 
   private getCurrentPreventiveState(

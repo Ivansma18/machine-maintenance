@@ -54,6 +54,11 @@ enum NotificationStatus {
   DISMISSED
 }
 
+enum AuditActorType {
+  USER
+  SERVICE
+}
+
 model MachineCategory {
   id          String    @id @default(uuid()) @db.Uuid
   name        String    @unique @db.VarChar(100)
@@ -224,4 +229,23 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
   @@index([userId, revokedAt])
+}
+
+model AuditEvent {
+  id         String         @id @default(uuid()) @db.Uuid
+  actorType  AuditActorType
+  actorId    String         @db.VarChar(150)
+  action     String         @db.VarChar(100)
+  entityType String         @db.VarChar(100)
+  entityId   String?        @db.VarChar(150)
+  before     Json?
+  after      Json?
+  reason     String?        @db.Text
+  requestId  String?        @db.VarChar(100)
+  createdAt  DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@index([actorType, actorId])
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+  @@index([createdAt])
 }

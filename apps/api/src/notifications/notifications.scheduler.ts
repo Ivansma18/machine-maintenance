@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { NotificationsService } from './notifications.service';
+import { serviceAuditContext } from '../audit/audit-context';
 
 @Injectable()
 export class NotificationsScheduler {
@@ -14,7 +15,10 @@ export class NotificationsScheduler {
   })
   async processPreventiveNotifications() {
     try {
-      const result = await this.notificationsService.processPreventiveNotifications();
+      const result = await this.notificationsService.processPreventiveNotifications(
+        new Date(),
+        serviceAuditContext('preventive-notifications'),
+      );
       this.logger.log(`Preventive notifications processed: ${JSON.stringify(result)}`);
     } catch (error) {
       this.logger.error(
