@@ -577,6 +577,7 @@ Comandos actualmente disponibles:
 
 ```text
 npm install
+npm run dev
 npm run dev:web
 npm run build:web
 npm run start:api
@@ -591,6 +592,11 @@ npm run prisma:seed
 npx impeccable update
 npx impeccable detect <ruta>
 ```
+
+Puertos locales definidos para evitar conflictos con otros proyectos:
+
+- API: `http://localhost:3002`.
+- Frontend: `http://localhost:5174`.
 
 Los comandos de tests unitarios y de integracion se agregaran junto con los modulos de dominio de las siguientes fases.
 

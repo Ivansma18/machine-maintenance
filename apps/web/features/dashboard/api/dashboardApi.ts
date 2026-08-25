@@ -1,6 +1,6 @@
 import type { DashboardSummary } from '../types';
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
 const summaryUrl = `${apiBaseUrl}/api/dashboard/summary`;
 const processUrl = `${apiBaseUrl}/api/notifications/process-preventive`;
 

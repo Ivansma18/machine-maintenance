@@ -38,7 +38,8 @@
 
 - Mantener cambios pequenos y verificables; no introducir ERP/CRM antes de cubrir el alcance actual.
 - Preservar nombres de dominio en ingles para codigo (`Machine`, `MaintenancePlan`, `MaintenanceLog`, `Notification`) aunque la documentacion pueda estar en espanol.
-- Comandos actuales: `npm install`, `npm run dev:web`, `npm run build:web`, `npm run start:api`, `npm run build:api`, `npm run test:api`, `npm run typecheck:api`, `npm run prisma:validate`, `npm run prisma:generate`, `npm run prisma:migrate:dev`, `npm run prisma:migrate:deploy`, `npm run prisma:seed`.
+- Comandos actuales: `npm install`, `npm run dev`, `npm run dev:web`, `npm run build:web`, `npm run start:api`, `npm run build:api`, `npm run test:api`, `npm run typecheck:api`, `npm run prisma:validate`, `npm run prisma:generate`, `npm run prisma:migrate:dev`, `npm run prisma:migrate:deploy`, `npm run prisma:seed`.
+- API local: `http://localhost:3002`; frontend local: `http://localhost:5174`.
 - Prisma API: copiar `apps/api/.env.example` a `apps/api/.env`, configurar `DATABASE_URL` y crear la base de datos manualmente antes de iniciar la API.
 - Despues ejecutar `npm run prisma:generate` y `npm run prisma:validate`.
 - Impeccable esta instalado a nivel de proyecto en `.opencode/skills/impeccable`; usar `/impeccable init` al iniciar el contexto visual.

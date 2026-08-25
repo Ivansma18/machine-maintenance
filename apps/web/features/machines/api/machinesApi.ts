@@ -5,7 +5,7 @@ import type {
   MachinesResponse,
 } from '../types';
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, cache: 'no-store' });

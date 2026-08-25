@@ -1,9 +1,20 @@
-{"timestamp":"00:00:01.684","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:00:03.481","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:00:03.977","source":"Browser","level":"ERROR","message":"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\"filled\"` instead. "}
-{"timestamp":"00:00:03.979","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\\\"filled\\\"` instead.\" \"\""}
-{"timestamp":"00:00:22.843","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:00:23.215","source":"Browser","level":"ERROR","message":"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\"filled\"` instead. "}
-{"timestamp":"00:00:23.216","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\\\"filled\\\"` instead.\" \"\""}
-{"timestamp":"00:01:23.812","source":"Server","level":"LOG","message":"✓ Compiled in 72ms"}
-{"timestamp":"00:01:48.002","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:01.157","source":"Server","level":"WARN","message":"⚠ Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack. Builds or page loads may be slower as a result."}
+{"timestamp":"00:00:01.474","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:04.624","source":"Server","level":"LOG","message":"○ Compiling / ..."}
+{"timestamp":"00:00:06.633","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:19.723","source":"Server","level":"ERROR","message":"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead."}
+{"timestamp":"00:00:20.030","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:20.232","source":"Browser","level":"ERROR","message":"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead. \n    at Array.forEach (<anonymous>) (<anonymous>)"}
+{"timestamp":"00:00:20.232","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead.\" \"\\n\\u001b[31m    at Array.forEach (<anonymous>)\\u001b[39m\" \"\\u001b[2m(<anonymous>)\\u001b[22m\""}
+{"timestamp":"00:00:22.989","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:26.432","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:26.546","source":"Browser","level":"ERROR","message":"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead. \n    at Array.forEach (<anonymous>) (<anonymous>)"}
+{"timestamp":"00:00:26.546","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead.\" \"\\n\\u001b[31m    at Array.forEach (<anonymous>)\\u001b[39m\" \"\\u001b[2m(<anonymous>)\\u001b[22m\""}
+{"timestamp":"00:00:32.811","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:35.228","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:35.332","source":"Browser","level":"ERROR","message":"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead. \n    at Array.forEach (<anonymous>) (<anonymous>)"}
+{"timestamp":"00:00:35.332","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead.\" \"\\n\\u001b[31m    at Array.forEach (<anonymous>)\\u001b[39m\" \"\\u001b[2m(<anonymous>)\\u001b[22m\""}
+{"timestamp":"00:00:46.523","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:51.164","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
+{"timestamp":"00:00:51.444","source":"Browser","level":"ERROR","message":"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead. \n    at Array.forEach (<anonymous>) (<anonymous>)"}
+{"timestamp":"00:00:51.444","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Modal] `destroyOnClose` is deprecated. Please use `destroyOnHidden` instead.\" \"\\n\\u001b[31m    at Array.forEach (<anonymous>)\\u001b[39m\" \"\\u001b[2m(<anonymous>)\\u001b[22m\""}
