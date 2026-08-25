@@ -18,6 +18,11 @@ export class MachinesController {
     return this.machinesService.findAll(query);
   }
 
+  @Get('categories')
+  findCategories() {
+    return this.machinesService.findCategories();
+  }
+
   @Patch(':id/deactivate')
   deactivate(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.machinesService.deactivate(id);

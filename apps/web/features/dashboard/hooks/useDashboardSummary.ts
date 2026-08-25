@@ -6,7 +6,7 @@ import { fetchDashboardSummary, processPreventiveNotifications } from '../api/da
 import type { DashboardSummary } from '../types';
 
 const connectionError =
-  'We could not connect to the operations API. Check that the backend is running and try again.';
+  'No pudimos conectar con la API de operaciones. Verifica que el backend este activo e intenta de nuevo.';
 
 export function useDashboardSummary() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -46,7 +46,7 @@ export function useDashboardSummary() {
       await processPreventiveNotifications();
       setRefreshKey((value) => value + 1);
     } catch {
-      setError('The alert scan could not be completed. Try again in a moment.');
+      setError('No se pudo revisar las alertas. Intenta de nuevo en un momento.');
       setRefreshing(false);
     }
   }

@@ -68,6 +68,13 @@ export class MachinesService {
     };
   }
 
+  findCategories() {
+    return this.prisma.machineCategory.findMany({
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, description: true },
+    });
+  }
+
   async findOne(id: string) {
     const machine = await this.prisma.machine.findUnique({
       where: { id },

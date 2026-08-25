@@ -14,10 +14,10 @@ export function DashboardSkeleton() {
 export function EmptyDashboard() {
   return (
     <div className="rounded-2xl border border-dashed border-[#bfc9c1] bg-white p-10 text-center">
-      <p className="m-0 text-lg font-black text-[#17211f]">No operational data yet</p>
+      <p className="m-0 text-lg font-black text-[#17211f]">Aun no hay datos operativos</p>
       <p className="mx-auto mb-0 mt-2 max-w-md text-sm leading-6 text-[#68736f]">
-        Add machines and maintenance plans to turn this room into a live view of the production
-        floor.
+        Agrega maquinas y planes de mantenimiento para convertir este espacio en una vista viva de
+        la planta de produccion.
       </p>
     </div>
   );

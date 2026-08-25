@@ -5,6 +5,7 @@ describe('MachinesService', () => {
   const prisma = {
     machineCategory: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
     },
     machine: {
       create: jest.fn(),
@@ -65,6 +66,16 @@ describe('MachinesService', () => {
         }),
       }),
     );
+  });
+
+  it('returns machine categories ordered by name', async () => {
+    prisma.machineCategory.findMany.mockResolvedValue([{ id: 'category-id', name: 'Mixer' }]);
+
+    await expect(service.findCategories()).resolves.toEqual([{ id: 'category-id', name: 'Mixer' }]);
+    expect(prisma.machineCategory.findMany).toHaveBeenCalledWith({
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, description: true },
+    });
   });
 
   it('deactivates a machine by moving it to RETIRED', async () => {
