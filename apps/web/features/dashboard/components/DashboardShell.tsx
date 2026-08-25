@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { AnimatedPage } from '@/components/motion/AnimatedPage';
 import { AnimatedSection } from '@/components/motion/AnimatedSection';
 import { AppButton } from '@/components/ui/AppButton';
+import { AppShell } from '@/components/layout/AppShell';
 
 import { DashboardError } from './DashboardError';
-import { DashboardHeader } from './DashboardHeader';
-import { DashboardSidebar } from './DashboardSidebar';
 
 type DashboardShellProps = {
   children: ReactNode;
@@ -24,28 +22,37 @@ export function DashboardShell({
   onRunAlertScan,
 }: DashboardShellProps) {
   return (
-    <AnimatedPage>
-      <div className="mx-auto flex min-h-screen max-w-[1500px]">
-        <DashboardSidebar />
-        <div className="min-w-0 flex-1">
-          <DashboardHeader />
-          <main className="px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-12" id="overview">
-            <AnimatedSection className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-              <div>
-                <p className="eyebrow">Estado operativo</p>
-                <p className="mb-0 mt-3 max-w-xl text-sm leading-6 text-[#68736f]">
-                  Identifica lo que necesita atencion antes de que comience el siguiente turno.
-                </p>
-              </div>
-              <AppButton loading={refreshing} variant="primary" onClick={onRunAlertScan}>
-                Revisar alertas
-              </AppButton>
-            </AnimatedSection>
-            {error ? <DashboardError message={error} onRetry={onRetry} /> : null}
-            {children}
-          </main>
+    <AppShell
+      activeHref="/"
+      header={{
+        eyebrow: 'Planta de produccion / todas las ubicaciones',
+        title: 'Centro de control',
+        aside: (
+          <>
+            <div className="hidden text-right sm:block">
+              <p className="m-0 text-sm font-bold text-[#17211f]">Operaciones</p>
+              <p className="m-0 text-xs text-[#68736f]">Vista de mantenimiento en vivo</p>
+            </div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d9e7db] text-xs font-black text-[#365441]">
+              OP
+            </div>
+          </>
+        ),
+      }}
+    >
+      <AnimatedSection className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div>
+          <p className="eyebrow">Estado operativo</p>
+          <p className="mb-0 mt-3 max-w-xl text-sm leading-6 text-[#68736f]">
+            Identifica lo que necesita atencion antes de que comience el siguiente turno.
+          </p>
         </div>
-      </div>
-    </AnimatedPage>
+        <AppButton loading={refreshing} variant="primary" onClick={onRunAlertScan}>
+          Revisar alertas
+        </AppButton>
+      </AnimatedSection>
+      {error ? <DashboardError message={error} onRetry={onRetry} /> : null}
+      {children}
+    </AppShell>
   );
 }
