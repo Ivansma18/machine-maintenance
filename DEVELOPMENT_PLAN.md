@@ -558,6 +558,11 @@ Dejar documentados los puntos de integracion y permisos necesarios para una futu
 - Los futuros puntos de integracion no requieren reestructurar las features existentes.
 - El siguiente bloque de trabajo queda definido como diseno e implementacion de Auth/Roles.
 
+### Documento de decisiones
+
+- Las decisiones de roles, permisos, identidad, auditoria y puntos de integracion estan documentadas en `docs/auth-roles-readiness.md`.
+- El MVP permanece sin control de acceso ejecutable hasta aprobar la arquitectura de Auth/Roles.
+
 ## 19. Orden de trabajo por feature
 
 Cada nueva feature debe seguir este orden:
