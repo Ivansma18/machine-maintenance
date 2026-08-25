@@ -11,7 +11,6 @@ describe('AuthService', () => {
     session: {
       create: jest.fn(),
       findUnique: jest.fn(),
-      update: jest.fn(),
       updateMany: jest.fn(),
     },
   };
@@ -40,6 +39,7 @@ describe('AuthService', () => {
     username: user.username,
     email: user.email,
     name: user.name,
+    isActive: true,
     roles: [
       {
         role: {
@@ -115,6 +115,16 @@ describe('AuthService', () => {
     expect(prisma.session.create).not.toHaveBeenCalled();
   });
 
+  it('rejects malformed password hashes before running expensive derivation', async () => {
+    prisma.user.findFirst.mockResolvedValue({
+      ...user,
+      passwordHash: 'scrypt$2147483648$8$1$salt$deadbeef',
+    });
+
+    await expect(service.login('admin', 'secret')).rejects.toThrow('Invalid credentials');
+    expect(prisma.session.create).not.toHaveBeenCalled();
+  });
+
   it('creates independent sessions for repeated logins', async () => {
     prisma.user.findFirst.mockResolvedValue(user);
     prisma.session.create
@@ -138,14 +148,18 @@ describe('AuthService', () => {
       revokedAt: null,
       user: { isActive: true },
     });
-    prisma.session.update.mockResolvedValue({});
+    prisma.session.updateMany.mockResolvedValue({ count: 1 });
     prisma.user.findUnique.mockResolvedValue(identityUser);
 
     const result = await service.validateSession('session-token');
 
-    expect(prisma.session.update).toHaveBeenCalledWith(
+    expect(prisma.session.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 'session-id' },
+        where: expect.objectContaining({
+          id: 'session-id',
+          revokedAt: null,
+          expiresAt: { gt: expect.any(Date) },
+        }),
         data: expect.objectContaining({
           lastSeenAt: expect.any(Date),
           expiresAt: expect.any(Date),
@@ -165,7 +179,34 @@ describe('AuthService', () => {
     });
 
     await expect(service.validateSession('session-token')).resolves.toBeNull();
-    expect(prisma.session.update).not.toHaveBeenCalled();
+    expect(prisma.session.updateMany).not.toHaveBeenCalled();
+  });
+
+  it('rejects a session revoked while it was being renewed', async () => {
+    prisma.session.findUnique.mockResolvedValue({
+      id: 'session-id',
+      userId: 'user-id',
+      expiresAt: new Date(Date.now() + 60_000),
+      revokedAt: null,
+      user: { isActive: true },
+    });
+    prisma.session.updateMany.mockResolvedValue({ count: 0 });
+
+    await expect(service.validateSession('session-token')).resolves.toBeNull();
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('rejects sessions for users that became inactive', async () => {
+    prisma.session.findUnique.mockResolvedValue({
+      id: 'session-id',
+      userId: 'user-id',
+      expiresAt: new Date(Date.now() + 60_000),
+      revokedAt: null,
+      user: { isActive: false },
+    });
+
+    await expect(service.validateSession('session-token')).resolves.toBeNull();
+    expect(prisma.session.updateMany).not.toHaveBeenCalled();
   });
 
   it('revokes only the presented session on logout', async () => {
@@ -179,5 +220,11 @@ describe('AuthService', () => {
         data: { revokedAt: expect.any(Date) },
       }),
     );
+  });
+
+  it('does not touch the database when logout has no cookie', async () => {
+    await service.logout(undefined);
+
+    expect(prisma.session.updateMany).not.toHaveBeenCalled();
   });
 });
