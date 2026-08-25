@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { AnimatedSection } from '@/components/motion/AnimatedSection';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppModal } from '@/components/ui/AppModal';
 import { AppPanel } from '@/components/ui/AppPanel';
@@ -35,14 +36,16 @@ export function MaintenanceLogsPage() {
         eyebrow: 'Espacio de trabajo / mantenimiento',
         title: 'Historial de mantenimientos',
         action: (
-          <AppButton
-            onClick={() => {
-              setFeedback(null);
-              setFormOpen(true);
-            }}
-          >
-            Registrar mantenimiento
-          </AppButton>
+          <PermissionGate permission="maintenance-logs:create">
+            <AppButton
+              onClick={() => {
+                setFeedback(null);
+                setFormOpen(true);
+              }}
+            >
+              Registrar mantenimiento
+            </AppButton>
+          </PermissionGate>
         ),
       }}
     >

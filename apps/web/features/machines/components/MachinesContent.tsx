@@ -1,4 +1,5 @@
 import { AppButton } from '@/components/ui/AppButton';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppPanel } from '@/components/ui/AppPanel';
 
 import { MachineList } from './MachineList';
@@ -23,7 +24,11 @@ export function MachinesContent({
     <AppPanel
       title="Registro de maquinas"
       eyebrow="Activos de produccion"
-      extra={<AppButton onClick={onCreate}>Agregar maquina</AppButton>}
+      extra={
+        <PermissionGate permission="machines:create">
+          <AppButton onClick={onCreate}>Agregar maquina</AppButton>
+        </PermissionGate>
+      }
     >
       <div className="flex items-center justify-between border-b border-[#dfe4df] px-5 py-4">
         <p className="m-0 text-sm text-[#68736f]">

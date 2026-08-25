@@ -1,4 +1,5 @@
 import { AppButton } from '@/components/ui/AppButton';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppTag } from '@/components/ui/AppTag';
 import { formatDateOnly } from '@/lib/formatters/dateFormatters';
 
@@ -79,12 +80,20 @@ export function MaintenancePlanList({
               </div>
             </div>
             <div className="mt-5 flex flex-wrap justify-end gap-2 border-t border-[#edf0ed] pt-4">
-              <AppButton variant="quiet" onClick={() => onEdit(plan)}>
-                Editar
-              </AppButton>
-              <AppButton variant="secondary" onClick={() => onToggleStatus(plan)}>
-                {plan.isActive ? 'Desactivar' : 'Activar'}
-              </AppButton>
+              <PermissionGate permission="maintenance-plans:update">
+                <AppButton variant="quiet" onClick={() => onEdit(plan)}>
+                  Editar
+                </AppButton>
+              </PermissionGate>
+              <PermissionGate
+                permission={
+                  plan.isActive ? 'maintenance-plans:deactivate' : 'maintenance-plans:activate'
+                }
+              >
+                <AppButton variant="secondary" onClick={() => onToggleStatus(plan)}>
+                  {plan.isActive ? 'Desactivar' : 'Activar'}
+                </AppButton>
+              </PermissionGate>
             </div>
           </article>
         );

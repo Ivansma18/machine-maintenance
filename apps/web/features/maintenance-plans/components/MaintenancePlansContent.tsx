@@ -1,4 +1,5 @@
 import { AppButton } from '@/components/ui/AppButton';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppPanel } from '@/components/ui/AppPanel';
 
 import { MaintenancePlanList } from './MaintenancePlanList';
@@ -23,7 +24,11 @@ export function MaintenancePlansContent({
     <AppPanel
       title="Registro de planes"
       eyebrow="Trabajo preventivo"
-      extra={<AppButton onClick={onCreate}>Agregar plan</AppButton>}
+      extra={
+        <PermissionGate permission="maintenance-plans:create">
+          <AppButton onClick={onCreate}>Agregar plan</AppButton>
+        </PermissionGate>
+      }
     >
       <div className="px-5 pb-5 pt-1">
         <p className="m-0 mb-4 text-xs font-semibold text-[#68736f]">{total} planes visibles</p>

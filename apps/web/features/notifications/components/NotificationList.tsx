@@ -1,4 +1,5 @@
 import { AppButton } from '@/components/ui/AppButton';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppTag } from '@/components/ui/AppTag';
 import { formatDateTime } from '@/lib/formatters/dateFormatters';
 
@@ -86,16 +87,22 @@ export function NotificationList({
             {notification.status === 'OPEN' || notification.status === 'ACKNOWLEDGED' ? (
               <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-[#edf0ed] pt-4">
                 {notification.status === 'OPEN' ? (
-                  <AppButton variant="secondary" onClick={() => onAcknowledge(notification)}>
-                    Reconocer
-                  </AppButton>
+                  <PermissionGate permission="notifications:acknowledge">
+                    <AppButton variant="secondary" onClick={() => onAcknowledge(notification)}>
+                      Reconocer
+                    </AppButton>
+                  </PermissionGate>
                 ) : null}
-                <AppButton variant="quiet" onClick={() => onResolve(notification)}>
-                  Resolver
-                </AppButton>
-                <AppButton variant="quiet" onClick={() => onDismiss(notification)}>
-                  Descartar
-                </AppButton>
+                <PermissionGate permission="notifications:resolve">
+                  <AppButton variant="quiet" onClick={() => onResolve(notification)}>
+                    Resolver
+                  </AppButton>
+                </PermissionGate>
+                <PermissionGate permission="notifications:dismiss">
+                  <AppButton variant="quiet" onClick={() => onDismiss(notification)}>
+                    Descartar
+                  </AppButton>
+                </PermissionGate>
               </div>
             ) : null}
           </article>

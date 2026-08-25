@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { AnimatedSection } from '@/components/motion/AnimatedSection';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppModal } from '@/components/ui/AppModal';
 import { AppPanel } from '@/components/ui/AppPanel';
@@ -54,7 +55,11 @@ export function MaintenancePlansPage() {
       header={{
         eyebrow: 'Espacio de trabajo / mantenimiento',
         title: 'Planes preventivos',
-        action: <AppButton onClick={openCreate}>Agregar plan</AppButton>,
+        action: (
+          <PermissionGate permission="maintenance-plans:create">
+            <AppButton onClick={openCreate}>Agregar plan</AppButton>
+          </PermissionGate>
+        ),
       }}
     >
       <AnimatedSection className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">

@@ -4,32 +4,7 @@ import type {
   MaintenancePlansResponse,
   PlanMachine,
 } from '../types';
-
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002';
-
-async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, { ...init, cache: 'no-store' });
-  if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as {
-      message?: string | string[];
-    } | null;
-    const message = Array.isArray(body?.message) ? body.message.join(', ') : body?.message;
-    throw new Error(
-      localizePlanError(message) ?? `La solicitud fallo con el estado ${response.status}`,
-    );
-  }
-  return response.json() as Promise<T>;
-}
-
-function localizePlanError(message?: string) {
-  if (!message) return undefined;
-  if (message.includes('equivalent active maintenance plan'))
-    return 'Ya existe un plan preventivo equivalente y activo para esta maquina.';
-  if (message.includes('does not exist')) return 'La maquina seleccionada no existe.';
-  if (message.includes('not found')) return 'El plan preventivo no fue encontrado.';
-  if (message.includes('startsAt')) return 'La fecha de inicio no es valida.';
-  return message;
-}
+import { apiRequest } from '@/lib/api/client';
 
 function toPayload(values: MaintenancePlanFormValues) {
   return {
@@ -51,19 +26,19 @@ export function fetchMaintenancePlans(
   const params = new URLSearchParams({ page: '1', limit: '100' });
   if (machineId) params.set('machineId', machineId);
   if (isActive !== undefined) params.set('isActive', String(isActive));
-  return request<MaintenancePlansResponse>(`${apiBaseUrl}/api/maintenance-plans?${params}`, {
+  return apiRequest<MaintenancePlansResponse>(`/api/maintenance-plans?${params}`, {
     signal,
   });
 }
 
 export function fetchPlanMachines(signal?: AbortSignal) {
-  return request<{ data: PlanMachine[] }>(`${apiBaseUrl}/api/machines?page=1&limit=100`, {
+  return apiRequest<{ data: PlanMachine[] }>('/api/machines?page=1&limit=100', {
     signal,
   });
 }
 
 export function createMaintenancePlan(values: MaintenancePlanFormValues) {
-  return request<MaintenancePlan>(`${apiBaseUrl}/api/maintenance-plans`, {
+  return apiRequest<MaintenancePlan>('/api/maintenance-plans', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(toPayload(values)),
@@ -71,7 +46,7 @@ export function createMaintenancePlan(values: MaintenancePlanFormValues) {
 }
 
 export function updateMaintenancePlan(id: string, values: MaintenancePlanFormValues) {
-  return request<MaintenancePlan>(`${apiBaseUrl}/api/maintenance-plans/${id}`, {
+  return apiRequest<MaintenancePlan>(`/api/maintenance-plans/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -86,13 +61,13 @@ export function updateMaintenancePlan(id: string, values: MaintenancePlanFormVal
 }
 
 export function activateMaintenancePlan(id: string) {
-  return request<MaintenancePlan>(`${apiBaseUrl}/api/maintenance-plans/${id}/activate`, {
+  return apiRequest<MaintenancePlan>(`/api/maintenance-plans/${id}/activate`, {
     method: 'PATCH',
   });
 }
 
 export function deactivateMaintenancePlan(id: string) {
-  return request<MaintenancePlan>(`${apiBaseUrl}/api/maintenance-plans/${id}/deactivate`, {
+  return apiRequest<MaintenancePlan>(`/api/maintenance-plans/${id}/deactivate`, {
     method: 'PATCH',
   });
 }
