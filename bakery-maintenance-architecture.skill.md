@@ -260,18 +260,24 @@ Regla:
 
 ### `User` futuro-minimo
 
-No es obligatorio para el primer CRUD, pero conviene reservar el concepto para ERP/CRM.
+No es obligatorio para el primer CRUD, pero conviene reservar el concepto para Auth/Roles y la evolucion hacia ERP/CRM.
 
 Campos sugeridos cuando se implemente:
 
 - `id`: UUID primary key.
-- `name`, `email`, `role`, `isActive`.
+- `name`, `email`, `isActive`.
 - `createdAt`, `updatedAt`.
+
+El rol no debe quedar como un string unico en `User` si se requiere mas de un rol por usuario. La implementacion futura debe decidir entre roles persistidos localmente, un proveedor externo o un modelo hibrido.
 
 Uso futuro:
 
-- Reemplazar `MaintenanceLog.performedBy` por `performedByUserId`.
+- Reemplazar `MaintenanceLog.performedBy` por `performedByUserId` y conservar un snapshot si el historial lo necesita.
 - Asignar responsables a notificaciones o planes.
+- Derivar permisos desde roles administrables, no desde condiciones hardcodeadas en features.
+- Registrar el actor de cambios y transiciones en una auditoria separada.
+
+La matriz de roles, permisos candidatos, puntos de integracion y decisiones pendientes esta documentada en `docs/auth-roles-readiness.md`.
 
 ## Enums Prisma sugeridos
 
