@@ -2,6 +2,8 @@
 
 Este documento define la evolucion posterior al primer alcance funcional del sistema. El objetivo es pasar de un CMMS/GMAO operativo por modulos a un sistema centrado en el expediente tecnico de cada maquina, las ordenes de trabajo, las refacciones y el analisis operativo.
 
+La especificacion detallada de la Fase 22 esta en `docs/machine-profile-design.md`.
+
 ## Alcance Ya Completado
 
 Las Fases 1 a 21 cubren:
