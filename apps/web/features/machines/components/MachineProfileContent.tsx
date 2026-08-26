@@ -12,17 +12,26 @@ import type { MachineProfile } from '../types';
 import { getMachineProfileNextAction } from '../utils/machineProfileFormatters';
 import { MachineWorkOrders } from '@/features/work-orders/components/MachineWorkOrders';
 import { useMachineWorkOrders } from '@/features/work-orders/hooks/useMachineWorkOrders';
+import { MachineProfileParts } from './MachineProfileParts';
+import { useMachineParts } from '../hooks/useMachineParts';
 
 export function MachineProfileContent({ profile }: { profile: MachineProfile }) {
   const { machine, health } = profile;
   const hasUrgency = health.overduePreventiveCount > 0 || health.openNotificationCount > 0;
   const workOrders = useMachineWorkOrders(machine.id);
+  const parts = useMachineParts(machine.id);
 
   return (
     <div className="space-y-6">
       <MachineProfileHero profile={profile} nextAction={getMachineProfileNextAction(profile)} />
       <MachineProfileHealth profile={profile} />
       <MachineWorkOrders orders={workOrders.orders} loading={workOrders.loading} />
+      <MachineProfileParts
+        result={parts.result}
+        loading={parts.loading}
+        error={parts.error}
+        onRetry={parts.retry}
+      />
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <MachineProfilePlans plans={profile.maintenancePlans} />
         <MachineProfileAlerts notifications={profile.openNotifications} />

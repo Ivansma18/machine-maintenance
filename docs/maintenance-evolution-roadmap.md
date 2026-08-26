@@ -243,6 +243,9 @@ consumo transaccional desde `MaintenanceLog`.
 - Costo acumulado, si se incorpora costo.
 - Alertas por consumo repetido.
 
+**Estado:** implementada en el expediente de maquina, con consumos recientes, frecuencia de
+reemplazo y alertas de existencia para refacciones criticas.
+
 ## Bloque 5: Programacion Y Calendario
 
 ### Fase 33: Agenda De Mantenimiento
@@ -388,5 +391,5 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 32: mostrar el historial de piezas y alertas de
-inventario dentro del expediente tecnico de maquina.
+El siguiente incremento recomendado es la Fase 33: visualizar trabajos proximos y vencidos en un
+calendario operativo.

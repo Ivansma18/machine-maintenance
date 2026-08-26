@@ -124,6 +124,31 @@ export type MachineProfile = {
   activity: MachineActivity[];
 };
 
+export type MachinePart = {
+  id: string;
+  sku: string;
+  name: string;
+  unit: 'UNIT' | 'SET' | 'METER' | 'LITER' | 'KILOGRAM';
+  isCritical: boolean;
+  inventory: {
+    quantityOnHand: number;
+    minimumQuantity: number;
+    stockState: 'AVAILABLE' | 'LOW' | 'OUT';
+  } | null;
+};
+
+export type MachinePartsResponse = {
+  recent: Array<{
+    id: string;
+    maintenanceLogId: string;
+    performedAt: string;
+    quantity: number;
+    notes: string | null;
+    part: MachinePart;
+  }>;
+  summary: Array<{ part: MachinePart; totalQuantity: number; usageCount: number }>;
+};
+
 export type MachineTimelineEvent = {
   id: string;
   kind: 'PLAN' | 'MAINTENANCE' | 'NOTIFICATION' | 'AUDIT';
