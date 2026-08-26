@@ -5,6 +5,7 @@ const navigation = [
   { href: '/machines', label: 'Maquinas' },
   { href: '/maintenance-plans', label: 'Planes preventivos' },
   { href: '/work-orders', label: 'Ordenes de trabajo' },
+  { href: '/maintenance-calendar', label: 'Agenda' },
   { href: '/maintenance-logs', label: 'Historial' },
   { href: '/notifications', label: 'Alertas' },
 ];
