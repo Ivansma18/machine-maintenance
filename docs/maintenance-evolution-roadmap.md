@@ -176,6 +176,9 @@ PATCH /api/work-orders/:id/cancel
 
 El expediente de maquina debe mostrar ordenes abiertas, vencidas y completadas recientemente.
 
+**Estado:** implementada en `apps/web/features/work-orders`, con lista paginada, filtros, detalle,
+creacion, acciones operativas y resumen por maquina.
+
 ### Fase 29: Completar Orden Y Generar Log
 
 **Objetivo:** conectar la planificacion con el historial real.
@@ -376,4 +379,4 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado son las Fases 22 a 25. Ese bloque reutiliza `Machine`, `MaintenancePlan`, `MaintenanceLog`, `Notification` y `AuditEvent`, y transforma la experiencia actual en un expediente tecnico completo por maquina sin introducir todavia ordenes de trabajo, inventario o ERP.
+El siguiente incremento recomendado es la Fase 29: completar una orden y generar su `MaintenanceLog`.
