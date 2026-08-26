@@ -49,7 +49,7 @@ export function MachineFilters({ categories, filters, onChange }: MachineFilters
   }
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(240px,1fr)_minmax(160px,0.7fr)_180px_180px_180px_auto]">
+    <div className="grid p-5 gap-3 lg:grid-cols-[minmax(240px,1fr)_minmax(160px,0.7fr)_180px_180px_180px_auto]">
       <form autoComplete="off" className="flex gap-2" onSubmit={applySearch}>
         <AppInput
           aria-label="Buscar maquinas"
