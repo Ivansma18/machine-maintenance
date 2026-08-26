@@ -13,6 +13,7 @@ import { MaintenanceLogsModule } from './maintenance-logs/maintenance-logs.modul
 import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { WorkOrdersModule } from './work-orders/work-orders.module';
+import { PartsModule } from './parts/parts.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { WorkOrdersModule } from './work-orders/work-orders.module';
     MaintenanceLogsModule,
     NotificationsModule,
     WorkOrdersModule,
+    PartsModule,
   ],
 })
 export class AppModule {}
