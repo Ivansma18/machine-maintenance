@@ -275,6 +275,9 @@ Programar revision electrica en 2 semanas.
 Programar cambio de banda el proximo viernes.
 ```
 
+**Estado:** implementada desde el expediente de cada maquina. Permite crear una orden preventiva
+con fecha programada, titulo, descripcion, prioridad y fecha de vencimiento.
+
 ## Bloque 6: Deteccion De Patrones
 
 ### Fase 35: Metricas De Reincidencia
@@ -394,5 +397,5 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 34: programar la siguiente intervencion desde el
-expediente tecnico de una maquina.
+El siguiente incremento recomendado es la Fase 35: detectar metricas de reincidencia y patrones de
+falla.
