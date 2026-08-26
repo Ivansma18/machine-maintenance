@@ -2,7 +2,7 @@ import { WorkOrderStatus, WorkOrderType } from '../generated/prisma/client';
 import { WorkOrdersService } from './work-orders.service';
 
 describe('WorkOrdersService', () => {
-  const prisma = {
+  const prisma: any = {
     machine: { findUnique: jest.fn() },
     maintenancePlan: { findUnique: jest.fn() },
     user: { findUnique: jest.fn() },
@@ -13,10 +13,14 @@ describe('WorkOrdersService', () => {
       findMany: jest.fn(),
       count: jest.fn(),
     },
-    $transaction: jest.fn((operations: Promise<unknown>[]) => Promise.all(operations)),
+    $transaction: jest.fn(
+      (operations: Promise<unknown>[] | ((tx: never) => Promise<unknown>)): Promise<unknown> =>
+        typeof operations === 'function' ? operations(prisma as never) : Promise.all(operations),
+    ),
   };
   const audit = { record: jest.fn() };
-  const service = new WorkOrdersService(prisma as never, audit as never);
+  const maintenanceLogs = { createInTransaction: jest.fn() };
+  const service = new WorkOrdersService(prisma as never, audit as never, maintenanceLogs as never);
   const context = { actorType: 'USER' as const, actorId: 'user-id', requestId: 'request-id' };
 
   beforeEach(() => jest.clearAllMocks());
@@ -75,6 +79,45 @@ describe('WorkOrdersService', () => {
     );
     expect(audit.record).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'work-order.started' }),
+      prisma,
+    );
+  });
+
+  it('creates a maintenance log and closes the work order atomically', async () => {
+    const current = {
+      id: 'order-id',
+      machineId: 'machine-id',
+      type: WorkOrderType.CORRECTIVE,
+      status: WorkOrderStatus.IN_PROGRESS,
+      maintenancePlan: null,
+    };
+    prisma.workOrder.findUnique.mockResolvedValue(current);
+    prisma.user.findUnique.mockResolvedValue({ name: 'Ada Technician' });
+    maintenanceLogs.createInTransaction.mockResolvedValue({ id: 'log-id', result: 'OK' });
+    prisma.workOrder.update.mockResolvedValue({
+      id: 'order-id',
+      status: WorkOrderStatus.COMPLETED,
+    });
+
+    const result = await service.complete(
+      'order-id',
+      { result: 'OK', notes: 'Belt adjusted', performedAt: '2026-08-26T10:00:00.000Z' },
+      context,
+    );
+
+    expect(maintenanceLogs.createInTransaction).toHaveBeenCalledWith(
+      prisma,
+      expect.objectContaining({ machineId: 'machine-id', performedBy: 'Ada Technician' }),
+      context,
+    );
+    expect(prisma.workOrder.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: WorkOrderStatus.COMPLETED }),
+      }),
+    );
+    expect(result.maintenanceLog).toEqual({ id: 'log-id', result: 'OK' });
+    expect(audit.record).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'work-order.completed' }),
       prisma,
     );
   });

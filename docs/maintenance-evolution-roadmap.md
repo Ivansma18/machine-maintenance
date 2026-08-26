@@ -194,6 +194,9 @@ WorkOrder abierta
 -> se generan eventos de auditoria
 ```
 
+**Estado:** implementada con cierre transaccional, captura de resultado/notas y generación del
+`MaintenanceLog` desde la orden completada.
+
 ## Bloque 4: Refacciones Y Piezas
 
 ### Fase 30: Diseno De Refacciones

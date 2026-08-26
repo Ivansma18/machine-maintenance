@@ -1,6 +1,7 @@
 import { apiRequest } from '@/lib/api/client';
 import type {
   WorkOrder,
+  WorkOrderCompletionValues,
   WorkOrderFilters,
   WorkOrderFormValues,
   WorkOrdersResponse,
@@ -33,8 +34,8 @@ export function assignWorkOrder(id: string, assignedToUserId: string) {
 export function startWorkOrder(id: string) {
   return mutate<WorkOrder>(`/api/work-orders/${id}/start`);
 }
-export function completeWorkOrder(id: string) {
-  return mutate<WorkOrder>(`/api/work-orders/${id}/complete`);
+export function completeWorkOrder(id: string, values: WorkOrderCompletionValues) {
+  return mutate<WorkOrder>(`/api/work-orders/${id}/complete`, values);
 }
 export function cancelWorkOrder(id: string, reason: string) {
   return mutate<WorkOrder>(`/api/work-orders/${id}/cancel`, { reason });
