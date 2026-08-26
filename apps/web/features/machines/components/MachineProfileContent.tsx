@@ -2,12 +2,12 @@ import { PermissionGate } from '@/components/auth/PermissionGate';
 import { AnimatedSection } from '@/components/motion/AnimatedSection';
 import { AppButton } from '@/components/ui/AppButton';
 
-import { MachineProfileActivity } from './MachineProfileActivity';
 import { MachineProfileAlerts } from './MachineProfileAlerts';
 import { MachineProfileHealth } from './MachineProfileHealth';
 import { MachineProfileHero } from './MachineProfileHero';
 import { MachineProfileHistory } from './MachineProfileHistory';
 import { MachineProfilePlans } from './MachineProfilePlans';
+import { MachineProfileTimeline } from './MachineProfileTimeline';
 import type { MachineProfile } from '../types';
 import { getMachineProfileNextAction } from '../utils/machineProfileFormatters';
 
@@ -25,7 +25,7 @@ export function MachineProfileContent({ profile }: { profile: MachineProfile }) 
       </div>
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <MachineProfileHistory logs={profile.recentMaintenanceLogs} machineId={machine.id} />
-        <MachineProfileActivity activity={profile.activity} />
+        <MachineProfileTimeline machineId={machine.id} />
       </div>
       <div className="flex flex-wrap gap-3 border-t border-[#dfe4df] pt-5">
         <PermissionGate permission="machines:update">

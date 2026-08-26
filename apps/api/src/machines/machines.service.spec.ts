@@ -14,8 +14,10 @@ describe('MachinesService', () => {
       update: jest.fn(),
       count: jest.fn(),
     },
-    maintenanceLog: { count: jest.fn() },
-    notification: { count: jest.fn() },
+    maintenanceLog: { count: jest.fn(), findMany: jest.fn() },
+    maintenancePlan: { findMany: jest.fn() },
+    auditEvent: { findMany: jest.fn() },
+    notification: { count: jest.fn(), findMany: jest.fn() },
     $transaction: jest.fn((operations: Promise<unknown>[]) => Promise.all(operations)),
   };
   const service = new MachinesService(prisma as never, { record: jest.fn() } as never);
@@ -159,6 +161,62 @@ describe('MachinesService', () => {
 
     await expect(service.findProfile('missing-machine')).rejects.toThrow(
       'Machine missing-machine not found',
+    );
+  });
+
+  it('returns a unified machine timeline with operational and audit events', async () => {
+    const createdAt = new Date('2026-08-01T10:00:00.000Z');
+    prisma.machine.findUnique.mockResolvedValue({
+      id: 'machine-id',
+      name: 'Deck Oven 01',
+      createdAt,
+    });
+    prisma.maintenancePlan.findMany.mockResolvedValue([
+      {
+        id: 'plan-id',
+        name: 'Monthly inspection',
+        isActive: true,
+        createdAt: new Date('2026-08-01T09:00:00.000Z'),
+        updatedAt: new Date('2026-08-01T09:00:00.000Z'),
+      },
+    ]);
+    prisma.maintenanceLog.findMany.mockResolvedValue([
+      {
+        id: 'log-id',
+        performedAt: new Date('2026-08-03T10:00:00.000Z'),
+        type: 'PREVENTIVE',
+        result: 'OK',
+        notes: 'Completed.',
+        performedBy: 'Technician',
+        createdAt,
+        maintenancePlan: { id: 'plan-id', name: 'Monthly inspection' },
+      },
+    ]);
+    prisma.notification.findMany.mockResolvedValue([]);
+    prisma.auditEvent.findMany.mockResolvedValue([
+      {
+        id: 'audit-id',
+        actorType: 'USER',
+        actorId: 'user-id',
+        action: 'machine.updated',
+        entityType: 'Machine',
+        entityId: 'machine-id',
+        reason: 'Updated location.',
+        createdAt: new Date('2026-08-04T10:00:00.000Z'),
+      },
+    ]);
+
+    const result = await service.findTimeline('machine-id');
+
+    expect(result.meta).toEqual({ total: 4, limit: 4, hasMore: false });
+    expect(result.data.map((event) => event.kind)).toEqual([
+      'AUDIT',
+      'MAINTENANCE',
+      'MACHINE',
+      'PLAN',
+    ]);
+    expect(prisma.auditEvent.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { entityId: { in: ['machine-id', 'plan-id', 'log-id'] } } }),
     );
   });
 

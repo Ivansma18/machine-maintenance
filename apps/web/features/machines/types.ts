@@ -123,3 +123,20 @@ export type MachineProfile = {
   openNotifications: ProfileNotification[];
   activity: MachineActivity[];
 };
+
+export type MachineTimelineEvent = {
+  id: string;
+  kind: 'PLAN' | 'MAINTENANCE' | 'NOTIFICATION' | 'AUDIT';
+  occurredAt: string;
+  entityType: string;
+  entityId: string | null;
+  title: string;
+  description: string | null;
+  metadata: Record<string, unknown>;
+};
+
+export type MachineTimelineResponse = {
+  machine: { id: string; name: string };
+  data: MachineTimelineEvent[];
+  meta: { total: number; limit: number; hasMore: boolean };
+};
