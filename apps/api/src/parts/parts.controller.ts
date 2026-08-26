@@ -66,4 +66,10 @@ export class PartsController {
   ) {
     return this.parts.addToMaintenanceLog(id, dto, auditContextFromRequest(req));
   }
+
+  @Get('machines/:id/parts') @RequirePermission('parts:read') findMachineParts(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    return this.parts.findMachineParts(id);
+  }
 }
