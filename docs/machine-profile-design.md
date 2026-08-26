@@ -220,6 +220,10 @@ Reglas del contrato:
 - Los datos no disponibles deben usar `null` de forma explicita.
 - Las fechas deben conservar formato ISO.
 - El backend calcula metricas y estados derivados.
+- `recentCriticalFailureCount` considera fallas de los ultimos 180 dias.
+- `openNotificationCount` cuenta solo notificaciones con estado `OPEN`.
+- `openNotifications` puede incluir notificaciones `OPEN` y `ACKNOWLEDGED` para conservar contexto accionable.
+- `recentMaintenanceLogs` y `openNotifications` deben tener limites para mantener estable la respuesta.
 - El endpoint requiere `machines:read`.
 - No incluir passwords, tokens, cookies ni datos internos de sesiones.
 
