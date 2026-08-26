@@ -55,6 +55,9 @@ export function MachineList({ machines, onEdit, onRetire }: MachineListProps) {
               </p>
             </div>
             <div className="flex justify-end gap-2">
+              <AppButton href={`/machines/${machine.id}`} variant="secondary">
+                Ver expediente
+              </AppButton>
               <PermissionGate permission="machines:update">
                 <AppButton variant="quiet" onClick={() => onEdit(machine)}>
                   Editar
