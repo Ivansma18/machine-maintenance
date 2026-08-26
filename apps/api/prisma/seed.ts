@@ -42,6 +42,12 @@ const permissionDefinitions = [
   { key: 'work-orders:start', description: 'Start work orders.' },
   { key: 'work-orders:complete', description: 'Complete work orders.' },
   { key: 'work-orders:cancel', description: 'Cancel work orders.' },
+  { key: 'parts:read', description: 'View the parts catalog.' },
+  { key: 'parts:create', description: 'Create catalog parts.' },
+  { key: 'parts:update', description: 'Update catalog parts.' },
+  { key: 'inventory:read', description: 'View inventory quantities.' },
+  { key: 'inventory:adjust', description: 'Adjust inventory quantities.' },
+  { key: 'maintenance-logs:parts', description: 'Record parts consumed by maintenance logs.' },
 ] as const;
 
 const roleDefinitions = [
@@ -78,6 +84,12 @@ const roleDefinitions = [
       'work-orders:start',
       'work-orders:complete',
       'work-orders:cancel',
+      'parts:read',
+      'parts:create',
+      'parts:update',
+      'inventory:read',
+      'inventory:adjust',
+      'maintenance-logs:parts',
     ],
   },
   {
@@ -95,6 +107,9 @@ const roleDefinitions = [
       'work-orders:read',
       'work-orders:start',
       'work-orders:complete',
+      'parts:read',
+      'inventory:read',
+      'maintenance-logs:parts',
     ],
   },
   {
@@ -107,6 +122,8 @@ const roleDefinitions = [
       'maintenance-logs:read',
       'notifications:read',
       'work-orders:read',
+      'parts:read',
+      'inventory:read',
     ],
   },
 ] as const;

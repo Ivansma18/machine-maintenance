@@ -4,6 +4,7 @@ Este documento define la evolucion posterior al primer alcance funcional del sis
 
 La especificacion detallada de la Fase 22 esta en `docs/machine-profile-design.md`.
 La especificacion detallada de la Fase 26 esta en `docs/work-order-design.md`.
+La especificacion detallada de la Fase 30 esta en `docs/parts-design.md`.
 
 ## Alcance Ya Completado
 
@@ -212,6 +213,8 @@ WorkOrder abierta
 
 **Modelos sugeridos:** `Part`, `InventoryItem` y `MaintenanceLogPart`.
 
+**Estado:** especificada en `docs/parts-design.md`, sin adelantar persistencia, API ni UI.
+
 ### Fase 31: Backend De Refacciones
 
 **Objetivo:** gestionar catalogo y consumo de piezas.
@@ -224,6 +227,9 @@ POST /api/parts
 PATCH /api/parts/:id
 POST /api/maintenance-logs/:id/parts
 ```
+
+**Estado:** implementada en `apps/api/src/parts`, con catalogo, inventario, ajustes auditados y
+consumo transaccional desde `MaintenanceLog`.
 
 ### Fase 32: UI De Refacciones En Expediente
 
@@ -382,4 +388,5 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 29: completar una orden y generar su `MaintenanceLog`.
+El siguiente incremento recomendado es la Fase 32: mostrar el historial de piezas y alertas de
+inventario dentro del expediente tecnico de maquina.

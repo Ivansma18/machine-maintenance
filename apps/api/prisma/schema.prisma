@@ -34,6 +34,14 @@ enum MaintenanceResult {
   CRITICAL_FAILURE
 }
 
+enum PartUnit {
+  UNIT
+  SET
+  METER
+  LITER
+  KILOGRAM
+}
+
 enum WorkOrderType {
   PREVENTIVE
   CORRECTIVE
@@ -152,10 +160,57 @@ model MaintenanceLog {
 
   machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   maintenancePlan MaintenancePlan? @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  parts           MaintenanceLogPart[]
 
   @@index([machineId, performedAt])
   @@index([maintenancePlanId, performedAt])
   @@index([type, result])
+}
+
+model Part {
+  id                     String   @id @default(uuid()) @db.Uuid
+  sku                    String   @unique @db.VarChar(100)
+  name                   String   @db.VarChar(180)
+  description            String?  @db.Text
+  unit                   PartUnit
+  manufacturer           String?  @db.VarChar(100)
+  manufacturerPartNumber String?  @db.VarChar(100)
+  isCritical             Boolean  @default(false)
+  isActive               Boolean  @default(true)
+  createdAt              DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime @updatedAt @db.Timestamptz(3)
+
+  inventory           InventoryItem?
+  maintenanceLogParts MaintenanceLogPart[]
+}
+
+model InventoryItem {
+  id              String   @id @default(uuid()) @db.Uuid
+  partId          String   @unique @db.Uuid
+  quantityOnHand  Float    @default(0)
+  minimumQuantity Float    @default(0)
+  reorderQuantity Float?
+  unitCost        Float?
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+
+  part Part @relation(fields: [partId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+}
+
+model MaintenanceLogPart {
+  id               String   @id @default(uuid()) @db.Uuid
+  maintenanceLogId String   @db.Uuid
+  partId           String   @db.Uuid
+  quantity         Float
+  unitCostSnapshot Float?
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now()) @db.Timestamptz(3)
+
+  maintenanceLog MaintenanceLog @relation(fields: [maintenanceLogId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  part           Part           @relation(fields: [partId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([maintenanceLogId, partId])
+  @@index([partId, createdAt])
 }
 
 model Notification {
