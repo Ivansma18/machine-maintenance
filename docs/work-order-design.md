@@ -117,6 +117,8 @@ No se permiten estas transiciones:
 - `OPEN` directamente a `COMPLETED`.
 - Cualquier transicion implicita producida por una edicion general.
 
+Una orden creada con `scheduledAt` queda en `SCHEDULED`; una orden creada sin esa fecha queda en `OPEN`. La primera version no necesita una accion separada para programar una orden existente.
+
 La Fase 27 puede exponer solo las transiciones necesarias para el primer flujo. Si se agrega `reopen` en una fase posterior, debe definirse como una capacidad separada, con permiso y auditoria propios.
 
 ## 6. Reglas De Negocio
@@ -171,6 +173,7 @@ GET   /api/work-orders
 POST  /api/work-orders
 GET   /api/work-orders/:id
 PATCH /api/work-orders/:id
+PATCH /api/work-orders/:id/assign
 PATCH /api/work-orders/:id/start
 PATCH /api/work-orders/:id/complete
 PATCH /api/work-orders/:id/cancel

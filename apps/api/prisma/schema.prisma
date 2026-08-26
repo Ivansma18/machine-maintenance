@@ -34,6 +34,27 @@ enum MaintenanceResult {
   CRITICAL_FAILURE
 }
 
+enum WorkOrderType {
+  PREVENTIVE
+  CORRECTIVE
+  INSPECTION
+}
+
+enum WorkOrderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum WorkOrderStatus {
+  OPEN
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 enum NotificationType {
   PREVENTIVE_DUE_SOON
   PREVENTIVE_OVERDUE
@@ -86,6 +107,7 @@ model Machine {
   maintenancePlans MaintenancePlan[]
   maintenanceLogs  MaintenanceLog[]
   notifications    Notification[]
+  workOrders       WorkOrder[]
 
   @@index([categoryId])
   @@index([status])
@@ -109,6 +131,7 @@ model MaintenancePlan {
   machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   maintenanceLogs MaintenanceLog[]
   notifications   Notification[]
+  workOrders      WorkOrder[]
 
   @@index([machineId])
   @@index([isActive, lastComputedDueAt])
@@ -168,8 +191,41 @@ model User {
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
-  roles    UserRole[]
-  sessions Session[]
+  roles              UserRole[]
+  sessions           Session[]
+  assignedWorkOrders WorkOrder[] @relation("WorkOrderAssignee")
+  createdWorkOrders  WorkOrder[] @relation("WorkOrderCreator")
+}
+
+model WorkOrder {
+  id                 String            @id @default(uuid()) @db.Uuid
+  machineId          String            @db.Uuid
+  maintenancePlanId  String?           @db.Uuid
+  title              String            @db.VarChar(180)
+  description        String?           @db.Text
+  type               WorkOrderType
+  priority           WorkOrderPriority @default(MEDIUM)
+  status             WorkOrderStatus   @default(OPEN)
+  scheduledAt        DateTime?         @db.Timestamptz(3)
+  dueAt              DateTime?         @db.Timestamptz(3)
+  assignedToUserId   String?           @db.Uuid
+  completedAt        DateTime?         @db.Timestamptz(3)
+  cancelledAt        DateTime?         @db.Timestamptz(3)
+  cancellationReason String?           @db.Text
+  createdByUserId    String            @db.Uuid
+  createdAt          DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime          @updatedAt @db.Timestamptz(3)
+
+  machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlan MaintenancePlan? @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  assignedTo      User?            @relation("WorkOrderAssignee", fields: [assignedToUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdBy       User             @relation("WorkOrderCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([machineId, status])
+  @@index([maintenancePlanId])
+  @@index([assignedToUserId, status])
+  @@index([status, dueAt])
+  @@index([priority, status])
 }
 
 model Role {
