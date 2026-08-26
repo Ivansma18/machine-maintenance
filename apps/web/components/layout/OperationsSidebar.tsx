@@ -4,6 +4,7 @@ const navigation = [
   { href: '/', label: 'Resumen' },
   { href: '/machines', label: 'Maquinas' },
   { href: '/maintenance-plans', label: 'Planes preventivos' },
+  { href: '/work-orders', label: 'Ordenes de trabajo' },
   { href: '/maintenance-logs', label: 'Historial' },
   { href: '/notifications', label: 'Alertas' },
 ];
