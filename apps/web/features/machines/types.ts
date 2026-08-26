@@ -48,3 +48,78 @@ export type MachinesResponse = {
   data: Machine[];
   meta: { page: number; limit: number; total: number; totalPages: number };
 };
+
+export type ProfileMaintenancePlan = {
+  id: string;
+  machineId: string;
+  machine: {
+    id: string;
+    name: string;
+    location: string;
+    status: MachineStatus;
+    category: MachineCategory;
+  };
+  name: string;
+  description: string | null;
+  frequencyDays: number;
+  warningDaysBefore: number;
+  isActive: boolean;
+  startsAt: string;
+  nextDueAt: string;
+  warningStartsAt: string;
+  isDueSoon: boolean;
+  isOverdue: boolean;
+};
+
+export type ProfileMaintenanceLog = {
+  id: string;
+  machineId: string;
+  maintenancePlanId: string | null;
+  machine: { id: string; name: string; location: string; status: MachineStatus };
+  maintenancePlan: { id: string; name: string } | null;
+  performedAt: string;
+  type: 'PREVENTIVE' | 'CORRECTIVE' | 'INSPECTION';
+  result: 'OK' | 'NEEDS_FOLLOW_UP' | 'FAILED' | 'CRITICAL_FAILURE';
+  notes: string | null;
+  performedBy: string;
+};
+
+export type ProfileNotification = {
+  id: string;
+  machineId: string;
+  maintenancePlanId: string | null;
+  machine: { id: string; name: string; location: string; category: MachineCategory };
+  maintenancePlan: { id: string; name: string } | null;
+  type: 'PREVENTIVE_DUE_SOON' | 'PREVENTIVE_OVERDUE' | 'URGENT_CRITICAL_FAILURE';
+  severity: 'INFO' | 'WARNING' | 'URGENT' | 'CRITICAL';
+  status: 'OPEN' | 'ACKNOWLEDGED';
+  title: string;
+  message: string;
+  dueAt: string | null;
+  createdAt: string;
+  resolvedAt: string | null;
+};
+
+export type MachineActivity = {
+  id: string;
+  kind: 'MAINTENANCE' | 'NOTIFICATION' | 'MACHINE';
+  occurredAt: string;
+  title: string;
+  description: string | null;
+};
+
+export type MachineProfile = {
+  machine: Machine;
+  health: {
+    lastMaintenanceAt: string | null;
+    daysSinceLastMaintenance: number | null;
+    nextMaintenanceAt: string | null;
+    overduePreventiveCount: number;
+    openNotificationCount: number;
+    recentCriticalFailureCount: number;
+  };
+  maintenancePlans: ProfileMaintenancePlan[];
+  recentMaintenanceLogs: ProfileMaintenanceLog[];
+  openNotifications: ProfileNotification[];
+  activity: MachineActivity[];
+};
