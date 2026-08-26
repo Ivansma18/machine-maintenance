@@ -45,6 +45,12 @@ export class MachinesController {
     return this.machinesService.findProfile(id);
   }
 
+  @Get(':id/timeline')
+  @RequirePermission('machines:read')
+  findTimeline(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.machinesService.findTimeline(id);
+  }
+
   @Patch(':id/deactivate')
   @RequirePermission('machines:retire')
   deactivate(
