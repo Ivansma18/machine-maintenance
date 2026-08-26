@@ -14,6 +14,8 @@ describe('MachinesService', () => {
       update: jest.fn(),
       count: jest.fn(),
     },
+    maintenanceLog: { count: jest.fn() },
+    notification: { count: jest.fn() },
     $transaction: jest.fn((operations: Promise<unknown>[]) => Promise.all(operations)),
   };
   const service = new MachinesService(prisma as never, { record: jest.fn() } as never);
@@ -65,6 +67,98 @@ describe('MachinesService', () => {
           status: MachineStatus.ACTIVE,
         }),
       }),
+    );
+  });
+
+  it('builds a machine profile with health metrics and recent activity', async () => {
+    const now = new Date('2026-08-25T00:00:00.000Z');
+    const machine = {
+      id: 'machine-id',
+      categoryId: 'category-id',
+      category: { id: 'category-id', name: 'Oven', description: null },
+      name: 'Deck Oven 01',
+      serialNumber: 'OV-01',
+      location: 'Production floor',
+      manufacturer: 'Bakery Systems',
+      model: 'D-100',
+      status: MachineStatus.ACTIVE,
+      criticality: 'HIGH',
+      installedAt: new Date('2025-01-01T00:00:00.000Z'),
+      createdAt: new Date('2025-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-08-20T00:00:00.000Z'),
+      maintenancePlans: [
+        {
+          id: 'plan-id',
+          machineId: 'machine-id',
+          machine: { id: 'machine-id', name: 'Deck Oven 01' },
+          name: 'Monthly inspection',
+          description: null,
+          frequencyDays: 30,
+          warningDaysBefore: 7,
+          isActive: true,
+          startsAt: new Date('2026-08-01T00:00:00.000Z'),
+          lastComputedDueAt: null,
+          createdAt: new Date('2026-08-01T00:00:00.000Z'),
+          updatedAt: new Date('2026-08-01T00:00:00.000Z'),
+          maintenanceLogs: [],
+        },
+      ],
+      maintenanceLogs: [
+        {
+          id: 'log-id',
+          performedAt: new Date('2026-08-20T00:00:00.000Z'),
+          type: 'CORRECTIVE',
+          result: 'OK',
+          notes: 'Adjusted the door sensor.',
+          maintenancePlan: null,
+        },
+      ],
+      notifications: [
+        {
+          id: 'notification-id',
+          machineId: 'machine-id',
+          maintenancePlanId: 'plan-id',
+          type: 'PREVENTIVE_DUE_SOON',
+          severity: 'WARNING',
+          status: 'OPEN',
+          title: 'Inspection due soon',
+          message: 'The inspection is approaching.',
+          dueAt: new Date('2026-08-31T00:00:00.000Z'),
+          createdAt: new Date('2026-08-24T00:00:00.000Z'),
+          resolvedAt: null,
+          maintenancePlan: { id: 'plan-id', name: 'Monthly inspection' },
+        },
+      ],
+    };
+    prisma.machine.findUnique.mockResolvedValue(machine);
+    prisma.maintenanceLog.count.mockResolvedValue(0);
+    prisma.notification.count.mockResolvedValue(1);
+
+    const result = await service.findProfile('machine-id', now);
+
+    expect(result.health).toEqual({
+      lastMaintenanceAt: new Date('2026-08-20T00:00:00.000Z'),
+      daysSinceLastMaintenance: 5,
+      nextMaintenanceAt: new Date('2026-08-31T00:00:00.000Z'),
+      overduePreventiveCount: 0,
+      openNotificationCount: 1,
+      recentCriticalFailureCount: 0,
+    });
+    expect(result.maintenancePlans[0]).toEqual(
+      expect.objectContaining({ isDueSoon: true, isOverdue: false }),
+    );
+    expect(result.activity[0]).toEqual(
+      expect.objectContaining({ id: 'notification-notification-id', kind: 'NOTIFICATION' }),
+    );
+  });
+
+  it('returns not found for a missing machine profile', async () => {
+    prisma.machine.findUnique.mockResolvedValue(null);
+    prisma.maintenanceLog.count.mockResolvedValue(0);
+    prisma.notification.count.mockResolvedValue(0);
+
+    await expect(service.findProfile('missing-machine')).rejects.toThrow(
+      'Machine missing-machine not found',
     );
   });
 
