@@ -260,6 +260,9 @@ reemplazo y alertas de existencia para refacciones criticas.
 - Trabajos vencidos.
 - Carga por tecnico.
 
+**Estado:** implementada en `/maintenance-calendar`, con vistas mensual y semanal, preventivos,
+ordenes agendadas, vencidos y resumen de carga operativa.
+
 ### Fase 34: Programacion Desde Expediente
 
 **Objetivo:** crear la siguiente intervencion directamente desde una maquina.
@@ -391,5 +394,5 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 33: visualizar trabajos proximos y vencidos en un
-calendario operativo.
+El siguiente incremento recomendado es la Fase 34: programar la siguiente intervencion desde el
+expediente tecnico de una maquina.
