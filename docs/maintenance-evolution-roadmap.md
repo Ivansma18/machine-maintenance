@@ -3,6 +3,7 @@
 Este documento define la evolucion posterior al primer alcance funcional del sistema. El objetivo es pasar de un CMMS/GMAO operativo por modulos a un sistema centrado en el expediente tecnico de cada maquina, las ordenes de trabajo, las refacciones y el analisis operativo.
 
 La especificacion detallada de la Fase 22 esta en `docs/machine-profile-design.md`.
+La especificacion detallada de la Fase 26 esta en `docs/work-order-design.md`.
 
 ## Alcance Ya Completado
 
@@ -109,6 +110,8 @@ GET /api/machines/:id/timeline
 ### Fase 26: Diseno De Ordenes De Trabajo
 
 **Objetivo:** separar el trabajo pendiente del historial ya realizado.
+
+**Especificacion detallada:** `docs/work-order-design.md`.
 
 Una orden de trabajo representa una actividad que debe ejecutarse, asignarse, programarse y cerrarse.
 

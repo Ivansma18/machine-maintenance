@@ -1,11 +1,9 @@
 import 'dotenv/config';
 
 import { randomBytes, scrypt } from 'node:crypto';
-import { promisify } from 'node:util';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client';
 
-const scryptAsync = promisify(scrypt);
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
@@ -37,6 +35,13 @@ const permissionDefinitions = [
     key: 'notifications:process-preventive',
     description: 'Run preventive notification processing.',
   },
+  { key: 'work-orders:read', description: 'View work orders.' },
+  { key: 'work-orders:create', description: 'Create work orders.' },
+  { key: 'work-orders:update', description: 'Update work orders.' },
+  { key: 'work-orders:assign', description: 'Assign work orders.' },
+  { key: 'work-orders:start', description: 'Start work orders.' },
+  { key: 'work-orders:complete', description: 'Complete work orders.' },
+  { key: 'work-orders:cancel', description: 'Cancel work orders.' },
 ] as const;
 
 const roleDefinitions = [
@@ -66,6 +71,13 @@ const roleDefinitions = [
       'notifications:resolve',
       'notifications:dismiss',
       'notifications:process-preventive',
+      'work-orders:read',
+      'work-orders:create',
+      'work-orders:update',
+      'work-orders:assign',
+      'work-orders:start',
+      'work-orders:complete',
+      'work-orders:cancel',
     ],
   },
   {
@@ -80,6 +92,9 @@ const roleDefinitions = [
       'notifications:read',
       'notifications:acknowledge',
       'notifications:resolve',
+      'work-orders:read',
+      'work-orders:start',
+      'work-orders:complete',
     ],
   },
   {
@@ -91,6 +106,7 @@ const roleDefinitions = [
       'maintenance-plans:read',
       'maintenance-logs:read',
       'notifications:read',
+      'work-orders:read',
     ],
   },
 ] as const;
@@ -113,12 +129,23 @@ function requiredEnvironment(name: string) {
 
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex');
-  const derivedKey = (await scryptAsync(password, salt, 64, {
-    N: 16_384,
-    r: 8,
-    p: 1,
-    maxmem: 32 * 1024 * 1024,
-  })) as Buffer;
+  const derivedKey = await new Promise<Buffer>((resolve, reject) => {
+    scrypt(
+      password,
+      salt,
+      64,
+      {
+        N: 16_384,
+        r: 8,
+        p: 1,
+        maxmem: 32 * 1024 * 1024,
+      },
+      (error, key) => {
+        if (error) reject(error);
+        else resolve(key);
+      },
+    );
+  });
 
   return `scrypt$16384$8$1$${salt}$${derivedKey.toString('hex')}`;
 }
