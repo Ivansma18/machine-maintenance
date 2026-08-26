@@ -8,6 +8,8 @@ import { CancelWorkOrderDto } from './dto/cancel-work-order.dto';
 import { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import { ListWorkOrdersDto } from './dto/list-work-orders.dto';
 import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
+import { CompleteWorkOrderDto } from './dto/complete-work-order.dto';
+import { MaintenanceLogsService } from '../maintenance-logs/maintenance-logs.service';
 import {
   toWorkOrderCancelData,
   toWorkOrderCreateData,
@@ -27,6 +29,7 @@ export class WorkOrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly maintenanceLogs: MaintenanceLogsService,
   ) {}
 
   async create(dto: CreateWorkOrderDto, context: AuditContext) {
@@ -163,8 +166,46 @@ export class WorkOrdersService {
     return this.transition(id, WorkOrderStatus.IN_PROGRESS, 'work-order.started', context);
   }
 
-  async complete(id: string, context: AuditContext) {
-    return this.transition(id, WorkOrderStatus.COMPLETED, 'work-order.completed', context);
+  async complete(id: string, dto: CompleteWorkOrderDto, context: AuditContext) {
+    const current = await this.findOne(id);
+    assertTransitionAllowed(current.status, WorkOrderStatus.COMPLETED, id);
+    const performer = await this.prisma.user.findUnique({
+      where: { id: context.actorId },
+      select: { name: true },
+    });
+    if (!performer) throw new NotFoundException(`User ${context.actorId} not found`);
+    return this.prisma.$transaction(async (tx) => {
+      const log = await this.maintenanceLogs.createInTransaction(
+        tx,
+        {
+          machineId: current.machineId,
+          maintenancePlanId: current.maintenancePlan?.id,
+          performedAt: dto.performedAt ?? new Date().toISOString(),
+          type: current.type,
+          result: dto.result,
+          notes: dto.notes,
+          performedBy: performer.name,
+        },
+        context,
+      );
+      const workOrder = await tx.workOrder.update({
+        where: { id },
+        data: { status: WorkOrderStatus.COMPLETED, completedAt: new Date() },
+        include: workOrderInclude,
+      });
+      await this.audit.record(
+        {
+          ...context,
+          action: 'work-order.completed',
+          entityType: 'WorkOrder',
+          entityId: id,
+          before: current,
+          after: { workOrder, maintenanceLog: log },
+        },
+        tx,
+      );
+      return { ...workOrder, maintenanceLog: log };
+    });
   }
 
   async cancel(id: string, dto: CancelWorkOrderDto, context: AuditContext) {

@@ -52,3 +52,8 @@ export type WorkOrderFormValues = {
 };
 
 export type WorkOrderMachine = { id: string; name: string; location: string };
+export type WorkOrderCompletionValues = {
+  result: 'OK' | 'NEEDS_FOLLOW_UP' | 'FAILED' | 'CRITICAL_FAILURE';
+  performedAt: string;
+  notes: string;
+};

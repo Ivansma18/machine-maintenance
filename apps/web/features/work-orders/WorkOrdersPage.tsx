@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { AppButton } from '@/components/ui/AppButton';
+import { AppInput } from '@/components/ui/AppInput';
 import { AppModal } from '@/components/ui/AppModal';
 import { AppPanel } from '@/components/ui/AppPanel';
+import { AppSelect } from '@/components/ui/AppSelect';
 import { PermissionGate } from '@/components/auth/PermissionGate';
 import { useSession } from '@/hooks/useSession';
 import { fetchMachines } from '@/features/machines/api/machinesApi';
@@ -14,7 +16,7 @@ import { WorkOrderFilters } from './components/WorkOrderFilters';
 import { WorkOrderForm } from './components/WorkOrderForm';
 import { WorkOrderList } from './components/WorkOrderList';
 import { useWorkOrders } from './hooks/useWorkOrders';
-import type { WorkOrder, WorkOrderMachine } from './types';
+import type { WorkOrder, WorkOrderCompletionValues, WorkOrderMachine } from './types';
 
 export function WorkOrdersPage() {
   const orders = useWorkOrders();
@@ -23,6 +25,12 @@ export function WorkOrdersPage() {
   const [selected, setSelected] = useState<WorkOrder | null>(null);
   const [cancelTarget, setCancelTarget] = useState<WorkOrder | null>(null);
   const [cancelReason, setCancelReason] = useState('');
+  const [completeTarget, setCompleteTarget] = useState<WorkOrder | null>(null);
+  const [completion, setCompletion] = useState<WorkOrderCompletionValues>({
+    result: 'OK',
+    performedAt: new Date().toISOString(),
+    notes: '',
+  });
   const [machines, setMachines] = useState<WorkOrderMachine[]>([]);
   useEffect(() => {
     const controller = new AbortController();
@@ -41,6 +49,12 @@ export function WorkOrdersPage() {
   async function action(callback: () => Promise<unknown>) {
     await callback();
     if (selected) setSelected(await fetchWorkOrder(selected.id));
+  }
+  async function complete() {
+    if (!completeTarget) return;
+    await orders.complete(completeTarget.id, completion);
+    setCompleteTarget(null);
+    setCompletion({ result: 'OK', performedAt: new Date().toISOString(), notes: '' });
   }
   return (
     <AppShell
@@ -108,7 +122,7 @@ export function WorkOrdersPage() {
               orders={orders.data}
               onView={view}
               onStart={(id) => void action(() => orders.start(id))}
-              onComplete={(id) => void action(() => orders.complete(id))}
+              onComplete={setCompleteTarget}
               onCancel={setCancelTarget}
             />
           )}
@@ -168,10 +182,65 @@ export function WorkOrdersPage() {
             loading={orders.actionLoading}
             onAssign={(id) => void action(() => orders.assign(selected.id, id))}
             onStart={() => void action(() => orders.start(selected.id))}
-            onComplete={() => void action(() => orders.complete(selected.id))}
+            onComplete={() => setCompleteTarget(selected)}
             onCancel={() => setCancelTarget(selected)}
           />
         ) : null}
+      </AppModal>
+      <AppModal
+        centered
+        okText="Completar y generar historial"
+        open={Boolean(completeTarget)}
+        title="Cerrar orden y registrar resultado"
+        confirmLoading={orders.actionLoading}
+        onCancel={() => setCompleteTarget(null)}
+        onOk={() => void complete()}
+      >
+        <div className="grid gap-4">
+          <p className="m-0 text-sm leading-6 text-[#68736f]">
+            Este cierre creará un registro inmutable en el historial de mantenimiento y completará
+            la orden en una sola operación.
+          </p>
+          <label className="grid gap-2 text-sm font-bold">
+            Resultado
+            <AppSelect
+              className="w-full"
+              value={completion.result}
+              options={[
+                { value: 'OK', label: 'Realizado correctamente' },
+                { value: 'NEEDS_FOLLOW_UP', label: 'Requiere seguimiento' },
+                { value: 'FAILED', label: 'Fallido' },
+                { value: 'CRITICAL_FAILURE', label: 'Falla crítica' },
+              ]}
+              onChange={(value) => setCompletion((current) => ({ ...current, result: value }))}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            Fecha de ejecución
+            <AppInput
+              type="datetime-local"
+              value={completion.performedAt.slice(0, 16)}
+              onChange={(event) =>
+                setCompletion((current) => ({
+                  ...current,
+                  performedAt: new Date(event.target.value).toISOString(),
+                }))
+              }
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-bold">
+            Resultado y notas
+            <textarea
+              className="min-h-28 rounded-lg border border-[#d9dfda] px-3 py-2 text-sm outline-none focus:border-[#426b50]"
+              maxLength={10000}
+              placeholder="Qué se encontró, qué se hizo y qué debe seguir..."
+              value={completion.notes}
+              onChange={(event) =>
+                setCompletion((current) => ({ ...current, notes: event.target.value }))
+              }
+            />
+          </label>
+        </div>
       </AppModal>
       <AppModal
         centered

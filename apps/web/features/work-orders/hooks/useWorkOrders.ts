@@ -9,7 +9,12 @@ import {
   completeWorkOrder,
   cancelWorkOrder,
 } from '../api/workOrdersApi';
-import type { WorkOrder, WorkOrderFilters, WorkOrderFormValues } from '../types';
+import type {
+  WorkOrder,
+  WorkOrderCompletionValues,
+  WorkOrderFilters,
+  WorkOrderFormValues,
+} from '../types';
 
 const initialFilters: WorkOrderFilters = { page: 1 };
 
@@ -74,7 +79,8 @@ export function useWorkOrders() {
     create: (values: WorkOrderFormValues) => run(() => createWorkOrder(values)),
     assign: (id: string, userId: string) => run(() => assignWorkOrder(id, userId)),
     start: (id: string) => run(() => startWorkOrder(id)),
-    complete: (id: string) => run(() => completeWorkOrder(id)),
+    complete: (id: string, values: WorkOrderCompletionValues) =>
+      run(() => completeWorkOrder(id, values)),
     cancel: (id: string, reason: string) => run(() => cancelWorkOrder(id, reason)),
   };
 }

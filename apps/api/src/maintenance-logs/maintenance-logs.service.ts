@@ -25,95 +25,101 @@ export class MaintenanceLogsService {
   ) {}
 
   async create(dto: CreateMaintenanceLogDto, context?: AuditContext) {
+    return this.prisma.$transaction((tx) => this.createInTransaction(tx, dto, context));
+  }
+
+  async createInTransaction(
+    tx: Prisma.TransactionClient,
+    dto: CreateMaintenanceLogDto,
+    context?: AuditContext,
+  ) {
     const performedAt = this.toDateTime(dto.performedAt);
 
-    return this.prisma.$transaction(async (tx) => {
-      const machine = await tx.machine.findUnique({
-        where: { id: dto.machineId },
-        select: { id: true, name: true },
-      });
-
-      if (!machine) {
-        throw new BadRequestException(`Machine ${dto.machineId} does not exist`);
-      }
-
-      if (dto.maintenancePlanId) {
-        const plan = await tx.maintenancePlan.findUnique({
-          where: { id: dto.maintenancePlanId },
-          select: { id: true, machineId: true },
-        });
-
-        if (!plan) {
-          throw new BadRequestException(`Maintenance plan ${dto.maintenancePlanId} does not exist`);
-        }
-
-        if (plan.machineId !== dto.machineId) {
-          throw new BadRequestException(
-            'The maintenance plan does not belong to the selected machine',
-          );
-        }
-      }
-
-      const log = await tx.maintenanceLog.create({
-        data: {
-          machine: { connect: { id: dto.machineId } },
-          maintenancePlan: dto.maintenancePlanId
-            ? { connect: { id: dto.maintenancePlanId } }
-            : undefined,
-          performedAt,
-          type: dto.type,
-          result: dto.result,
-          notes: dto.notes,
-          performedBy: dto.performedBy,
-        },
-        include: logInclude,
-      });
-
-      const criticalNotificationResult =
-        dto.result === MaintenanceResult.CRITICAL_FAILURE
-          ? await this.ensureCriticalNotification(tx, {
-              machineId: dto.machineId,
-              machineName: machine.name,
-              maintenancePlanId: dto.maintenancePlanId,
-              performedAt,
-              notes: dto.notes,
-            })
-          : null;
-      const criticalNotification = criticalNotificationResult?.notification ?? null;
-      const createdCriticalNotification = criticalNotificationResult?.created
-        ? criticalNotificationResult.notification
-        : null;
-
-      if (context && createdCriticalNotification) {
-        await this.audit.record(
-          {
-            ...context,
-            action: 'notification.urgent.created',
-            entityType: 'Notification',
-            entityId: createdCriticalNotification.id,
-            after: createdCriticalNotification,
-          },
-          tx,
-        );
-      }
-
-      const result = { ...log, criticalNotification };
-
-      if (context) {
-        await this.audit.record(
-          {
-            ...context,
-            action: 'maintenance-log.created',
-            entityType: 'MaintenanceLog',
-            entityId: log.id,
-            after: result,
-          },
-          tx,
-        );
-      }
-
-      return result;
+    const machine = await tx.machine.findUnique({
+      where: { id: dto.machineId },
+      select: { id: true, name: true },
     });
+
+    if (!machine) {
+      throw new BadRequestException(`Machine ${dto.machineId} does not exist`);
+    }
+
+    if (dto.maintenancePlanId) {
+      const plan = await tx.maintenancePlan.findUnique({
+        where: { id: dto.maintenancePlanId },
+        select: { id: true, machineId: true },
+      });
+
+      if (!plan) {
+        throw new BadRequestException(`Maintenance plan ${dto.maintenancePlanId} does not exist`);
+      }
+
+      if (plan.machineId !== dto.machineId) {
+        throw new BadRequestException(
+          'The maintenance plan does not belong to the selected machine',
+        );
+      }
+    }
+
+    const log = await tx.maintenanceLog.create({
+      data: {
+        machine: { connect: { id: dto.machineId } },
+        maintenancePlan: dto.maintenancePlanId
+          ? { connect: { id: dto.maintenancePlanId } }
+          : undefined,
+        performedAt,
+        type: dto.type,
+        result: dto.result,
+        notes: dto.notes,
+        performedBy: dto.performedBy,
+      },
+      include: logInclude,
+    });
+
+    const criticalNotificationResult =
+      dto.result === MaintenanceResult.CRITICAL_FAILURE
+        ? await this.ensureCriticalNotification(tx, {
+            machineId: dto.machineId,
+            machineName: machine.name,
+            maintenancePlanId: dto.maintenancePlanId,
+            performedAt,
+            notes: dto.notes,
+          })
+        : null;
+    const criticalNotification = criticalNotificationResult?.notification ?? null;
+    const createdCriticalNotification = criticalNotificationResult?.created
+      ? criticalNotificationResult.notification
+      : null;
+
+    if (context && createdCriticalNotification) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'notification.urgent.created',
+          entityType: 'Notification',
+          entityId: createdCriticalNotification.id,
+          after: createdCriticalNotification,
+        },
+        tx,
+      );
+    }
+
+    const result = { ...log, criticalNotification };
+
+    if (context) {
+      await this.audit.record(
+        {
+          ...context,
+          action: 'maintenance-log.created',
+          entityType: 'MaintenanceLog',
+          entityId: log.id,
+          after: result,
+        },
+        tx,
+      );
+    }
+
+    return result;
   }
 
   async findAll(query: ListMaintenanceLogsDto) {

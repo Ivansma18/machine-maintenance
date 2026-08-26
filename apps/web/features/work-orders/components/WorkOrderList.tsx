@@ -22,7 +22,7 @@ export function WorkOrderList({
   orders: WorkOrder[];
   onView: (order: WorkOrder) => void;
   onStart: (id: string) => void;
-  onComplete: (id: string) => void;
+  onComplete: (order: WorkOrder) => void;
   onCancel: (order: WorkOrder) => void;
 }) {
   if (!orders.length)
@@ -80,7 +80,7 @@ export function WorkOrderList({
               ) : null}
               {order.status === 'IN_PROGRESS' ? (
                 <PermissionGate permission="work-orders:complete">
-                  <AppButton onClick={() => onComplete(order.id)}>Completar</AppButton>
+                  <AppButton onClick={() => onComplete(order)}>Completar</AppButton>
                 </PermissionGate>
               ) : null}
               {!['COMPLETED', 'CANCELLED'].includes(order.status) ? (
