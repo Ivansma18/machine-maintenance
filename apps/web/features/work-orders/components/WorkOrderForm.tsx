@@ -13,6 +13,10 @@ export function WorkOrderForm({
   currentUserId,
   onCancel,
   onSubmit,
+  initialValues,
+  fixedMachineId,
+  submitLabel = 'Crear orden',
+  requireSchedule = false,
 }: {
   machines: WorkOrderMachine[];
   loading: boolean;
@@ -20,6 +24,10 @@ export function WorkOrderForm({
   currentUserId?: string;
   onCancel: () => void;
   onSubmit: (values: WorkOrderFormValues) => Promise<void>;
+  initialValues?: Partial<WorkOrderFormValues>;
+  fixedMachineId?: string;
+  submitLabel?: string;
+  requireSchedule?: boolean;
 }) {
   const [values, setValues] = useState<WorkOrderFormValues>({
     machineId: '',
@@ -27,14 +35,19 @@ export function WorkOrderForm({
     description: '',
     type: 'CORRECTIVE',
     priority: 'MEDIUM',
+    ...initialValues,
   });
   const [validationError, setValidationError] = useState<string | null>(null);
   const set = <K extends keyof WorkOrderFormValues>(key: K, value: WorkOrderFormValues[K]) =>
     setValues((current) => ({ ...current, [key]: value }));
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!values.machineId || !values.title.trim()) {
-      setValidationError('La máquina y el título son obligatorios.');
+    if (!values.machineId || !values.title.trim() || (requireSchedule && !values.scheduledAt)) {
+      setValidationError(
+        requireSchedule
+          ? 'La máquina, el título y la fecha de programación son obligatorios.'
+          : 'La máquina y el título son obligatorios.',
+      );
       return;
     }
     setValidationError(null);
@@ -55,6 +68,7 @@ export function WorkOrderForm({
           Máquina
           <AppSelect
             className="w-full"
+            disabled={Boolean(fixedMachineId)}
             placeholder="Selecciona una máquina"
             value={values.machineId || undefined}
             options={machines.map((machine) => ({
@@ -151,7 +165,7 @@ export function WorkOrderForm({
           Cancelar
         </AppButton>
         <AppButton htmlType="submit" loading={loading}>
-          Crear orden
+          {submitLabel}
         </AppButton>
       </div>
     </form>

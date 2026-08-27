@@ -27,7 +27,9 @@ export function MachineProfilePage({ id }: { id: string }) {
       {!query.loading && query.error && query.errorStatus !== 404 ? (
         <ErrorState message={query.error} onRetry={query.retry} />
       ) : null}
-      {query.profile ? <MachineProfileContent profile={query.profile} /> : null}
+      {query.profile ? (
+        <MachineProfileContent onRefresh={query.retry} profile={query.profile} />
+      ) : null}
     </AppShell>
   );
 }
