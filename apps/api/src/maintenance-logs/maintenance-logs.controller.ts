@@ -5,10 +5,14 @@ import type { AuthenticatedRequest } from '../authorization/types/authenticated-
 import { CreateMaintenanceLogDto } from './dto/create-maintenance-log.dto';
 import { ListMaintenanceLogsDto } from './dto/list-maintenance-logs.dto';
 import { MaintenanceLogsService } from './maintenance-logs.service';
+import { MaintenanceLogsMetricsService } from './maintenance-logs-metrics.service';
 
 @Controller('maintenance-logs')
 export class MaintenanceLogsController {
-  constructor(private readonly maintenanceLogsService: MaintenanceLogsService) {}
+  constructor(
+    private readonly maintenanceLogsService: MaintenanceLogsService,
+    private readonly metricsService: MaintenanceLogsMetricsService,
+  ) {}
 
   @Post()
   @RequirePermission('maintenance-logs:create')
@@ -20,6 +24,12 @@ export class MaintenanceLogsController {
   @RequirePermission('maintenance-logs:read')
   findAll(@Query() query: ListMaintenanceLogsDto) {
     return this.maintenanceLogsService.findAll(query);
+  }
+
+  @Get('metrics/recurrence')
+  @RequirePermission('maintenance-logs:read')
+  recurrenceMetrics() {
+    return this.metricsService.recurrenceMetrics();
   }
 
   @Get(':id')

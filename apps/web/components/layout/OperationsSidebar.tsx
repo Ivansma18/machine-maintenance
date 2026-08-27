@@ -6,6 +6,7 @@ const navigation = [
   { href: '/maintenance-plans', label: 'Planes preventivos' },
   { href: '/work-orders', label: 'Ordenes de trabajo' },
   { href: '/maintenance-calendar', label: 'Agenda' },
+  { href: '/maintenance-metrics', label: 'Reincidencia' },
   { href: '/maintenance-logs', label: 'Historial' },
   { href: '/notifications', label: 'Alertas' },
 ];
