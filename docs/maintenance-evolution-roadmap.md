@@ -328,6 +328,9 @@ regla, severidad, evidencia y siguiente paso para cada maquina detectada.
 - Fecha.
 - `requestId`.
 
+**Estado:** implementada en `/audit`, protegida por `audit:read`, con paginacion y filtros por actor,
+accion, entidad, request y fecha.
+
 ### Fase 38: Administracion De Usuarios Y Roles
 
 **Objetivo:** eliminar la dependencia exclusiva del seed para gestionar identidad.
@@ -403,4 +406,4 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 37: permitir la consulta de eventos auditados.
+El siguiente incremento recomendado es la Fase 38: administrar usuarios y roles desde la aplicacion.
