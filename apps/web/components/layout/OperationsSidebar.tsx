@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
 type OperationsSidebarProps = { activeHref: string };
 
 const navigation = [
@@ -15,6 +19,15 @@ const navigation = [
 ];
 
 export function OperationsSidebar({ activeHref }: OperationsSidebarProps) {
+  const mobileNavigationRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const activeLink =
+      mobileNavigationRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
+
+    activeLink?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [activeHref]);
+
   return (
     <>
       <aside className="hidden w-64 shrink-0 flex-col border-r border-[#dfe4df] bg-[#eef1ec] px-6 py-7 lg:flex">
@@ -44,6 +57,7 @@ export function OperationsSidebar({ activeHref }: OperationsSidebarProps) {
         </div>
       </aside>
       <nav
+        ref={mobileNavigationRef}
         className="flex w-full gap-2 overflow-x-auto border-b border-[#dfe4df] bg-[#eef1ec] px-4 py-3 lg:hidden"
         aria-label="Navegacion principal mobile"
       >
@@ -64,6 +78,7 @@ function NavigationLink({
 }) {
   return (
     <a
+      aria-current={item.href === activeHref ? 'page' : undefined}
       className={
         item.href === activeHref
           ? 'shrink-0 rounded-lg bg-[#17211f] px-3 py-2.5 text-sm font-bold text-white'
