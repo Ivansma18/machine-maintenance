@@ -9,6 +9,7 @@ const navigation = [
   { href: '/maintenance-metrics', label: 'Reincidencia' },
   { href: '/audit', label: 'Auditoría' },
   { href: '/users', label: 'Usuarios' },
+  { href: '/locations', label: 'Estructura' },
   { href: '/maintenance-logs', label: 'Historial' },
   { href: '/notifications', label: 'Alertas' },
 ];

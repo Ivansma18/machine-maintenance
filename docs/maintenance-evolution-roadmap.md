@@ -368,6 +368,9 @@ ProductionLine
 Site -> Area -> ProductionLine -> Machine
 ```
 
+**Estado:** implementada con modelos Prisma y migracion para `Site`, `Area` y `ProductionLine`,
+catalogo administrativo en `/locations` y asignacion opcional de linea en maquinas.
+
 ### Fase 40: Permisos Por Alcance
 
 **Objetivo:** evolucionar de permisos globales a permisos limitados por planta o area.
@@ -409,4 +412,4 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 39: modelar plantas, areas y lineas operativas.
+El siguiente incremento recomendado es la Fase 40: aplicar permisos por alcance de planta o area.

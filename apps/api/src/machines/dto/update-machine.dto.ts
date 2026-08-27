@@ -33,6 +33,10 @@ export class UpdateMachineDto {
   location?: string;
 
   @IsOptional()
+  @IsUUID()
+  productionLineId?: string;
+
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)

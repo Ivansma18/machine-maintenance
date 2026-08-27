@@ -26,6 +26,7 @@ type MachineFormProps = {
   error: string | null;
   onCancel: () => void;
   onSubmit: (values: MachineFormValues) => Promise<void>;
+  productionLines?: { id: string; name: string; siteName: string; areaName: string }[];
 };
 
 const statuses: MachineStatus[] = ['ACTIVE', 'INACTIVE', 'UNDER_MAINTENANCE', 'RETIRED'];
@@ -37,6 +38,7 @@ function getInitialValues(machine?: Machine): MachineFormValues {
     name: machine?.name ?? '',
     serialNumber: machine?.serialNumber ?? '',
     location: machine?.location ?? '',
+    productionLineId: machine?.productionLineId ?? '',
     manufacturer: machine?.manufacturer ?? '',
     model: machine?.model ?? '',
     status: machine?.status ?? 'ACTIVE',
@@ -52,6 +54,7 @@ export function MachineForm({
   error,
   onCancel,
   onSubmit,
+  productionLines = [],
 }: MachineFormProps) {
   const [values, setValues] = useState(() => getInitialValues(machine));
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -126,6 +129,19 @@ export function MachineForm({
             name="serialNumber"
             value={values.serialNumber}
             onChange={(event) => updateValue('serialNumber', event.target.value)}
+          />
+        </label>
+        <label className="grid gap-2 text-sm font-bold text-[#17211f] sm:col-span-2">
+          Linea de produccion
+          <AppSelect
+            className="w-full"
+            placeholder="Sin linea asignada"
+            value={values.productionLineId || undefined}
+            options={productionLines.map((line) => ({
+              label: `${line.siteName} · ${line.areaName} · ${line.name}`,
+              value: line.id,
+            }))}
+            onChange={(value) => updateValue('productionLineId', value ?? '')}
           />
         </label>
         <label className="grid gap-2 text-sm font-bold text-[#17211f]">

@@ -23,6 +23,7 @@ export class MachinesService {
 
   async create(dto: CreateMachineDto, context?: AuditContext) {
     await this.ensureCategoryExists(dto.categoryId);
+    if (dto.productionLineId) await this.ensureProductionLineExists(dto.productionLineId);
 
     try {
       const machine = await this.prisma.machine.create({
@@ -211,6 +212,9 @@ export class MachinesService {
     if (dto.categoryId) {
       await this.ensureCategoryExists(dto.categoryId);
     }
+    if (dto.productionLineId) {
+      await this.ensureProductionLineExists(dto.productionLineId);
+    }
 
     try {
       const machine = await this.prisma.machine.update({
@@ -271,5 +275,13 @@ export class MachinesService {
     if (!category) {
       throw new BadRequestException(`Machine category ${categoryId} does not exist`);
     }
+  }
+
+  private async ensureProductionLineExists(productionLineId: string) {
+    const line = await this.prisma.productionLine.findUnique({
+      where: { id: productionLineId },
+      select: { id: true },
+    });
+    if (!line) throw new BadRequestException(`Production line ${productionLineId} does not exist`);
   }
 }

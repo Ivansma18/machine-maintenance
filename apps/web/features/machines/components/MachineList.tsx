@@ -38,7 +38,11 @@ export function MachineList({ machines, onEdit, onRetire }: MachineListProps) {
             </div>
             <div>
               <p className="eyebrow">Ubicacion</p>
-              <p className="m-0 mt-1 text-sm text-[#68736f]">{machine.location}</p>
+              <p className="m-0 mt-1 text-sm text-[#68736f]">
+                {machine.productionLine
+                  ? `${machine.productionLine.area.site.name} · ${machine.productionLine.area.name} · ${machine.productionLine.name}`
+                  : machine.location}
+              </p>
             </div>
             <div className="flex gap-2 lg:flex-col lg:items-start">
               <AppTag tone={getMachineStatusTone(machine.status)}>

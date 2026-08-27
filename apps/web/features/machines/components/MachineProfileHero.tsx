@@ -36,6 +36,9 @@ export function MachineProfileHero({
             </p>
             <p className="m-0 text-sm text-[#c4d0c7]">
               ID corto: {machine.id.slice(0, 8)} · {machine.location}
+              {machine.productionLine
+                ? ` · ${machine.productionLine.area.site.name} / ${machine.productionLine.area.name} / ${machine.productionLine.name}`
+                : ''}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
