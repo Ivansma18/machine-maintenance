@@ -12,6 +12,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import type { AuditContext } from '../audit/audit.types';
 import { ListNotificationsDto } from './dto/list-notifications.dto';
+import type { AuthenticatedIdentity } from '../auth/types/auth.types';
+import { machineScopeWhere } from '../authorization/scope-filter';
 import {
   calculatePlanSchedule,
   VALID_PREVENTIVE_RESULTS,
@@ -42,7 +44,7 @@ export class NotificationsService {
     private readonly audit: AuditService,
   ) {}
 
-  async findAll(query: ListNotificationsDto) {
+  async findAll(query: ListNotificationsDto, identity?: AuthenticatedIdentity) {
     const where: Prisma.NotificationWhereInput = {
       machineId: query.machineId,
       maintenancePlanId: query.maintenancePlanId,
@@ -50,6 +52,7 @@ export class NotificationsService {
       severity: query.severity,
       status: query.status,
     };
+    if (identity) where.machine = machineScopeWhere(identity);
     const skip = (query.page - 1) * query.limit;
 
     const [data, total] = await this.prisma.$transaction([

@@ -11,8 +11,8 @@ export class NotificationsController {
 
   @Get()
   @RequirePermission('notifications:read')
-  findAll(@Query() query: ListNotificationsDto) {
-    return this.notificationsService.findAll(query);
+  findAll(@Query() query: ListNotificationsDto, @Req() request: AuthenticatedRequest) {
+    return this.notificationsService.findAll(query, request.identity);
   }
 
   @Post('process-preventive')

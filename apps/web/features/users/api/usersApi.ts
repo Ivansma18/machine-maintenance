@@ -16,6 +16,12 @@ export function updateUserStatus(id: string, isActive: boolean) {
 export function assignUserRoles(id: string, roleIds: string[]) {
   return mutate<ManagedUser>(`/api/users/${id}/roles`, 'PATCH', { roleIds });
 }
+export function assignUserScopes(
+  id: string,
+  scopes: { level: 'SITE' | 'AREA'; siteId?: string; areaId?: string }[],
+) {
+  return mutate<ManagedUser>(`/api/users/${id}/scopes`, 'PATCH', { scopes });
+}
 export function resetUserPassword(id: string) {
   return mutate<{ temporaryPassword: string }>(`/api/users/${id}/reset-password`, 'POST');
 }

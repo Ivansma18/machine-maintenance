@@ -11,12 +11,16 @@ import { UserForm } from './components/UserForm';
 import { UserList } from './components/UserList';
 import { useUsersAdmin } from './hooks/useUsersAdmin';
 import type { ManagedUser } from './types';
+import { useLocations } from '@/features/locations/hooks/useLocations';
 
 export function UsersPage() {
   const admin = useUsersAdmin();
+  const locations = useLocations();
   const [createOpen, setCreateOpen] = useState(false);
   const [roleTarget, setRoleTarget] = useState<ManagedUser | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [scopeTarget, setScopeTarget] = useState<ManagedUser | null>(null);
+  const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
   async function submit(values: Parameters<typeof admin.create>[0]) {
     await admin.create(values);
     setCreateOpen(false);
@@ -71,6 +75,12 @@ export function UsersPage() {
               setRoleTarget(user);
               setSelectedRoles(user.roles.map((role) => role.id));
             }}
+            onScopes={(user) => {
+              setScopeTarget(user);
+              setSelectedScopes(
+                user.scopes.map((scope) => `${scope.level}:${scope.siteId ?? scope.areaId}`),
+              );
+            }}
           />
         </AppPanel>
       </PermissionGate>
@@ -89,6 +99,56 @@ export function UsersPage() {
           onCancel={() => setCreateOpen(false)}
           onSubmit={submit}
         />
+      </AppModal>
+      <AppModal
+        centered
+        footer={null}
+        open={Boolean(scopeTarget)}
+        title={`Alcances · ${scopeTarget?.name ?? ''}`}
+        width={560}
+        onCancel={() => setScopeTarget(null)}
+      >
+        {scopeTarget ? (
+          <div className="grid gap-5">
+            <p className="m-0 text-sm leading-6 text-[#68736f]">
+              Sin alcances asignados, el usuario no verá máquinas. Los usuarios con rol Admin
+              conservan acceso global.
+            </p>
+            <AppSelect
+              mode="multiple"
+              className="w-full"
+              value={selectedScopes}
+              options={locations.data.flatMap((site) => [
+                { value: `SITE:${site.id}`, label: `Planta · ${site.name}` },
+                ...site.areas.map((area) => ({
+                  value: `AREA:${area.id}`,
+                  label: `Área · ${site.name} / ${area.name}`,
+                })),
+              ])}
+              onChange={setSelectedScopes}
+            />
+            <div className="flex justify-end">
+              <AppButton
+                loading={admin.actionLoading}
+                onClick={() =>
+                  void admin
+                    .assignScopes(
+                      scopeTarget.id,
+                      selectedScopes.map((value) => {
+                        const [level, id] = value.split(':');
+                        return level === 'SITE'
+                          ? { level: 'SITE' as const, siteId: id }
+                          : { level: 'AREA' as const, areaId: id };
+                      }),
+                    )
+                    .then(() => setScopeTarget(null))
+                }
+              >
+                Guardar alcances
+              </AppButton>
+            </div>
+          </div>
+        ) : null}
       </AppModal>
       <AppModal
         centered

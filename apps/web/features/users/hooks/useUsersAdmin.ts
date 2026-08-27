@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   assignUserRoles,
+  assignUserScopes,
   createUser,
   fetchRoles,
   fetchUsers,
@@ -68,6 +69,10 @@ export function useUsersAdmin() {
     create: (values: CreateUserValues) => run(() => createUser(values)),
     toggle: (user: ManagedUser) => run(() => updateUserStatus(user.id, !user.isActive)),
     assignRoles: (id: string, roleIds: string[]) => run(() => assignUserRoles(id, roleIds)),
+    assignScopes: (
+      id: string,
+      scopes: { level: 'SITE' | 'AREA'; siteId?: string; areaId?: string }[],
+    ) => run(() => assignUserScopes(id, scopes)),
     resetPassword: (id: string) =>
       run(async () => {
         const result = await resetUserPassword(id);

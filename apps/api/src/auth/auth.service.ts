@@ -51,6 +51,7 @@ const identityUserSelect = {
       },
     },
   },
+  scopes: { select: { level: true, siteId: true, areaId: true } },
 } as const;
 
 @Injectable()
@@ -185,7 +186,7 @@ export class AuthService {
       name: user.name,
     };
 
-    return { user: authenticatedUser, roles, permissions, sessionId };
+    return { user: authenticatedUser, roles, permissions, scopes: user.scopes, sessionId };
   }
 
   private expirationFrom(date: Date) {

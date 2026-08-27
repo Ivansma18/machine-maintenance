@@ -29,8 +29,8 @@ export class MachinesController {
 
   @Get()
   @RequirePermission('machines:read')
-  findAll(@Query() query: ListMachinesDto) {
-    return this.machinesService.findAll(query);
+  findAll(@Query() query: ListMachinesDto, @Req() request: AuthenticatedRequest) {
+    return this.machinesService.findAll(query, request.identity);
   }
 
   @Get('categories')
@@ -41,14 +41,20 @@ export class MachinesController {
 
   @Get(':id/profile')
   @RequirePermission('machines:read')
-  findProfile(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.machinesService.findProfile(id);
+  findProfile(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.machinesService.findProfile(id, new Date(), request.identity);
   }
 
   @Get(':id/timeline')
   @RequirePermission('machines:read')
-  findTimeline(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.machinesService.findTimeline(id);
+  findTimeline(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.machinesService.findTimeline(id, request.identity);
   }
 
   @Patch(':id/deactivate')
@@ -62,8 +68,11 @@ export class MachinesController {
 
   @Get(':id')
   @RequirePermission('machines:read')
-  findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.machinesService.findOne(id);
+  findOne(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.machinesService.findOne(id, request.identity);
   }
 
   @Patch(':id')

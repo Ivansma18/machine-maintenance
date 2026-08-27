@@ -384,6 +384,9 @@ Usuario B solo consulta Planta Sur.
 
 Esta fase debe conservar la posibilidad de permisos globales para administradores y cuentas de servicio.
 
+**Estado:** implementada con asignaciones de usuario a planta o area, identidad de sesion con
+alcances efectivos y filtrado de maquinas para usuarios fuera del alcance.
+
 ## Orden Recomendado
 
 La secuencia recomendada es:
@@ -412,4 +415,5 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 40: aplicar permisos por alcance de planta o area.
+El siguiente incremento recomendado es continuar con la evolucion multi-planta y los permisos por
+alcance en los dominios restantes.

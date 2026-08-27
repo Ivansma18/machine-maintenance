@@ -22,8 +22,8 @@ export class MaintenanceLogsController {
 
   @Get()
   @RequirePermission('maintenance-logs:read')
-  findAll(@Query() query: ListMaintenanceLogsDto) {
-    return this.maintenanceLogsService.findAll(query);
+  findAll(@Query() query: ListMaintenanceLogsDto, @Req() request: AuthenticatedRequest) {
+    return this.maintenanceLogsService.findAll(query, request.identity);
   }
 
   @Get('metrics/recurrence')

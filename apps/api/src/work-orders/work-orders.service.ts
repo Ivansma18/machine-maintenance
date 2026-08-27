@@ -7,6 +7,8 @@ import { AssignWorkOrderDto } from './dto/assign-work-order.dto';
 import { CancelWorkOrderDto } from './dto/cancel-work-order.dto';
 import { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import { ListWorkOrdersDto } from './dto/list-work-orders.dto';
+import type { AuthenticatedIdentity } from '../auth/types/auth.types';
+import { machineScopeWhere } from '../authorization/scope-filter';
 import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
 import { CompleteWorkOrderDto } from './dto/complete-work-order.dto';
 import { MaintenanceLogsService } from '../maintenance-logs/maintenance-logs.service';
@@ -63,7 +65,7 @@ export class WorkOrdersService {
     }
   }
 
-  async findAll(query: ListWorkOrdersDto) {
+  async findAll(query: ListWorkOrdersDto, identity?: AuthenticatedIdentity) {
     const where: Prisma.WorkOrderWhereInput = {
       machineId: query.machineId,
       maintenancePlanId: query.maintenancePlanId,
@@ -79,6 +81,7 @@ export class WorkOrdersService {
             }
           : undefined,
     };
+    if (identity) where.machine = machineScopeWhere(identity);
     const skip = (query.page - 1) * query.limit;
     const [data, total] = await this.prisma.$transaction([
       this.prisma.workOrder.findMany({

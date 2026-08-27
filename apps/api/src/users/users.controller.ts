@@ -3,6 +3,7 @@ import { RequirePermission } from '../authorization/decorators/require-permissio
 import { auditContextFromRequest } from '../audit/audit-context';
 import type { AuthenticatedRequest } from '../authorization/types/authenticated-request.type';
 import { AssignUserRolesDto } from './dto/assign-user-roles.dto';
+import { AssignUserScopesDto } from './dto/assign-user-scopes.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { UsersService } from './users.service';
@@ -39,5 +40,12 @@ export class UsersController {
     @Req() request: AuthenticatedRequest,
   ) {
     return this.users.resetPassword(id, auditContextFromRequest(request));
+  }
+  @Patch(':id/scopes') assignScopes(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() dto: AssignUserScopesDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.users.assignScopes(id, dto.scopes, auditContextFromRequest(request));
   }
 }

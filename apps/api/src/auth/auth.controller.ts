@@ -72,6 +72,7 @@ export class AuthController {
       user: identity.user,
       roles: identity.roles,
       permissions: identity.permissions,
+      scopes: identity.scopes,
     };
   }
 

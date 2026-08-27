@@ -13,6 +13,8 @@ import {
   toMachineCreateData,
   toMachineUpdateData,
 } from './machine-mappers';
+import type { AuthenticatedIdentity } from '../auth/types/auth.types';
+import { mergeMachineScope } from '../authorization/scope-filter';
 
 @Injectable()
 export class MachinesService {
@@ -50,7 +52,7 @@ export class MachinesService {
     }
   }
 
-  async findAll(query: ListMachinesDto) {
+  async findAll(query: ListMachinesDto, identity?: AuthenticatedIdentity) {
     const where: Prisma.MachineWhereInput = {
       categoryId: query.categoryId,
       status: query.status,
@@ -65,17 +67,18 @@ export class MachinesService {
           ]
         : undefined,
     };
+    const scopedWhere = identity ? mergeMachineScope(where, identity) : where;
     const skip = (query.page - 1) * query.limit;
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.machine.findMany({
-        where,
+        where: scopedWhere,
         include: machineInclude,
         orderBy: [{ status: 'asc' }, { name: 'asc' }],
         skip,
         take: query.limit,
       }),
-      this.prisma.machine.count({ where }),
+      this.prisma.machine.count({ where: scopedWhere }),
     ]);
 
     return {
@@ -96,13 +99,15 @@ export class MachinesService {
     });
   }
 
-  async findProfile(id: string, now = new Date()) {
+  async findProfile(id: string, now = new Date(), identity?: AuthenticatedIdentity) {
     const [machine, recentCriticalFailureCount, openNotificationCount] =
       await this.prisma.$transaction([
-        this.prisma.machine.findUnique({
-          where: { id },
-          include: profileMachineInclude,
-        }),
+        identity
+          ? this.prisma.machine.findFirst({
+              where: { AND: [{ id }, mergeMachineScope({}, identity)] },
+              include: profileMachineInclude,
+            })
+          : this.prisma.machine.findUnique({ where: { id }, include: profileMachineInclude }),
         this.prisma.maintenanceLog.count({
           where: {
             machineId: id,
@@ -122,11 +127,16 @@ export class MachinesService {
     return buildMachineProfile(machine, now, recentCriticalFailureCount, openNotificationCount);
   }
 
-  async findTimeline(id: string) {
-    const machine = await this.prisma.machine.findUnique({
-      where: { id },
-      select: { id: true, name: true, createdAt: true },
-    });
+  async findTimeline(id: string, identity?: AuthenticatedIdentity) {
+    const machine = identity
+      ? await this.prisma.machine.findFirst({
+          where: { AND: [{ id }, mergeMachineScope({}, identity)] },
+          select: { id: true, name: true, createdAt: true },
+        })
+      : await this.prisma.machine.findUnique({
+          where: { id },
+          select: { id: true, name: true, createdAt: true },
+        });
 
     if (!machine) {
       throw new NotFoundException(`Machine ${id} not found`);
@@ -193,11 +203,13 @@ export class MachinesService {
     return buildMachineTimeline(machine, plans, logs, notifications, audits);
   }
 
-  async findOne(id: string) {
-    const machine = await this.prisma.machine.findUnique({
-      where: { id },
-      include: machineInclude,
-    });
+  async findOne(id: string, identity?: AuthenticatedIdentity) {
+    const machine = identity
+      ? await this.prisma.machine.findFirst({
+          where: { AND: [{ id }, mergeMachineScope({}, identity)] },
+          include: machineInclude,
+        })
+      : await this.prisma.machine.findUnique({ where: { id }, include: machineInclude });
 
     if (!machine) {
       throw new NotFoundException(`Machine ${id} not found`);

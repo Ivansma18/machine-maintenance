@@ -134,6 +134,7 @@ model Site {
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime @updatedAt @db.Timestamptz(3)
   areas       Area[]
+  userScopes  UserScope[]
   @@index([isActive])
 }
 
@@ -145,6 +146,7 @@ model Area {
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
   site      Site             @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   lines     ProductionLine[]
+  userScopes UserScope[]
   @@unique([siteId, name])
   @@index([siteId])
 }
@@ -285,9 +287,31 @@ model User {
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
   roles              UserRole[]
+  scopes             UserScope[]
   sessions           Session[]
   assignedWorkOrders WorkOrder[] @relation("WorkOrderAssignee")
   createdWorkOrders  WorkOrder[] @relation("WorkOrderCreator")
+}
+
+enum ScopeLevel {
+  SITE
+  AREA
+}
+
+model UserScope {
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @db.Uuid
+  level     ScopeLevel
+  siteId    String?    @db.Uuid
+  areaId    String?    @db.Uuid
+  createdAt DateTime   @default(now()) @db.Timestamptz(3)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  site      Site?      @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  area      Area?      @relation(fields: [areaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@unique([userId, level, siteId, areaId])
+  @@index([userId])
+  @@index([siteId])
+  @@index([areaId])
 }
 
 model WorkOrder {
