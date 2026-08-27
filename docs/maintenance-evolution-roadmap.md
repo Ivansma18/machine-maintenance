@@ -292,6 +292,9 @@ con fecha programada, titulo, descripcion, prioridad y fecha de vencimiento.
 - Misma pieza reemplazada con demasiada frecuencia.
 - Alto costo de mantenimiento por maquina.
 
+**Estado:** implementada en `/maintenance-metrics`. Calcula de forma deterministica, sobre los
+ultimos seis meses, fallas, preventivos vencidos, piezas repetidas y costo estimado por maquina.
+
 ### Fase 36: Reglas De Recomendacion
 
 **Objetivo:** generar recomendaciones operativas explicables mediante reglas.
@@ -397,5 +400,5 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 35: detectar metricas de reincidencia y patrones de
-falla.
+El siguiente incremento recomendado es la Fase 36: generar recomendaciones operativas explicables
+mediante reglas.

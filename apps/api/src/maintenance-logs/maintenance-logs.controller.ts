@@ -22,6 +22,12 @@ export class MaintenanceLogsController {
     return this.maintenanceLogsService.findAll(query);
   }
 
+  @Get('metrics/recurrence')
+  @RequirePermission('maintenance-logs:read')
+  recurrenceMetrics() {
+    return this.maintenanceLogsService.recurrenceMetrics();
+  }
+
   @Get(':id')
   @RequirePermission('maintenance-logs:read')
   findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
