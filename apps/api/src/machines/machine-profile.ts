@@ -4,7 +4,10 @@ import {
   VALID_PREVENTIVE_RESULTS,
 } from '../maintenance-plans/maintenance-plan-dates';
 
-export const machineInclude = { category: true } as const;
+export const machineInclude = {
+  category: true,
+  productionLine: { include: { area: { include: { site: true } } } },
+} as const;
 const profileNotificationStatuses: NotificationStatus[] = [
   NotificationStatus.OPEN,
   NotificationStatus.ACKNOWLEDGED,
@@ -12,6 +15,7 @@ const profileNotificationStatuses: NotificationStatus[] = [
 
 export const profileMachineInclude = {
   category: true,
+  productionLine: { include: { area: { include: { site: true } } } },
   maintenancePlans: {
     orderBy: [{ isActive: 'desc' }, { startsAt: 'asc' }],
     include: {
@@ -80,6 +84,8 @@ export function buildMachineProfile(
       name: machine.name,
       serialNumber: machine.serialNumber,
       location: machine.location,
+      productionLineId: machine.productionLineId,
+      productionLine: machine.productionLine,
       manufacturer: machine.manufacturer,
       model: machine.model,
       status: machine.status,

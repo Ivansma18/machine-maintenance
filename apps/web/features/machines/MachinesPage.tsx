@@ -14,9 +14,17 @@ import { MachineForm } from './components/MachineForm';
 import { MachinesContent } from './components/MachinesContent';
 import { useMachines } from './hooks/useMachines';
 import type { Machine } from './types';
+import { useLocations } from '@/features/locations/hooks/useLocations';
 
 export function MachinesPage() {
   const machines = useMachines();
+  const locations = useLocations();
+  const sites = locations.data;
+  const productionLines = sites.flatMap((site) =>
+    site.areas.flatMap((area) =>
+      area.lines.map((line) => ({ ...line, siteName: site.name, areaName: area.name })),
+    ),
+  );
   const [editingMachine, setEditingMachine] = useState<Machine | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [retiringMachine, setRetiringMachine] = useState<Machine | null>(null);
@@ -172,6 +180,7 @@ export function MachinesPage() {
           machine={editingMachine ?? undefined}
           onCancel={() => setFormOpen(false)}
           onSubmit={saveMachine}
+          productionLines={productionLines}
         />
       </AppModal>
       <AppModal

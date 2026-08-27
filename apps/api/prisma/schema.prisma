@@ -103,6 +103,7 @@ model Machine {
   name         String             @db.VarChar(150)
   serialNumber String?            @unique @db.VarChar(100)
   location     String             @db.VarChar(150)
+  productionLineId String?        @db.Uuid
   manufacturer String?            @db.VarChar(100)
   model        String?            @db.VarChar(100)
   status       MachineStatus      @default(ACTIVE)
@@ -112,6 +113,7 @@ model Machine {
   updatedAt    DateTime           @updatedAt @db.Timestamptz(3)
 
   category         MachineCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  productionLine   ProductionLine?   @relation(fields: [productionLineId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   maintenancePlans MaintenancePlan[]
   maintenanceLogs  MaintenanceLog[]
   notifications    Notification[]
@@ -121,6 +123,42 @@ model Machine {
   @@index([status])
   @@index([criticality])
   @@index([location])
+  @@index([productionLineId])
+}
+
+model Site {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(150)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+  areas       Area[]
+  @@index([isActive])
+}
+
+model Area {
+  id        String   @id @default(uuid()) @db.Uuid
+  siteId    String   @db.Uuid
+  name      String   @db.VarChar(150)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  site      Site             @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  lines     ProductionLine[]
+  @@unique([siteId, name])
+  @@index([siteId])
+}
+
+model ProductionLine {
+  id        String   @id @default(uuid()) @db.Uuid
+  areaId    String   @db.Uuid
+  name      String   @db.VarChar(150)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  area      Area      @relation(fields: [areaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  machines  Machine[]
+  @@unique([areaId, name])
+  @@index([areaId])
 }
 
 model MaintenancePlan {

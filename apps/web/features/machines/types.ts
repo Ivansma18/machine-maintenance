@@ -14,6 +14,12 @@ export type Machine = {
   name: string;
   serialNumber: string | null;
   location: string;
+  productionLineId: string | null;
+  productionLine: {
+    id: string;
+    name: string;
+    area: { id: string; name: string; site: { id: string; name: string } };
+  } | null;
   manufacturer: string | null;
   model: string | null;
   status: MachineStatus;
@@ -37,6 +43,7 @@ export type MachineFormValues = {
   name: string;
   serialNumber: string;
   location: string;
+  productionLineId: string;
   manufacturer: string;
   model: string;
   status: MachineStatus;

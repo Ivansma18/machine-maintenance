@@ -50,6 +50,8 @@ const permissionDefinitions = [
   { key: 'maintenance-logs:parts', description: 'Record parts consumed by maintenance logs.' },
   { key: 'audit:read', description: 'View audit events.' },
   { key: 'users:manage', description: 'Manage users, roles, and access.' },
+  { key: 'locations:read', description: 'View sites, areas, and production lines.' },
+  { key: 'locations:manage', description: 'Manage sites, areas, and production lines.' },
 ] as const;
 
 const roleDefinitions = [
@@ -92,6 +94,7 @@ const roleDefinitions = [
       'inventory:read',
       'inventory:adjust',
       'maintenance-logs:parts',
+      'locations:read',
     ],
   },
   {
@@ -112,6 +115,7 @@ const roleDefinitions = [
       'parts:read',
       'inventory:read',
       'maintenance-logs:parts',
+      'locations:read',
     ],
   },
   {
@@ -126,6 +130,7 @@ const roleDefinitions = [
       'work-orders:read',
       'parts:read',
       'inventory:read',
+      'locations:read',
     ],
   },
 ] as const;
