@@ -7,6 +7,7 @@ export function RecurrenceMetricCards({ summary }: { summary: RecurrenceMetrics[
     ['Fallas registradas', summary.failureCount, 'Resultado fallido o critico'],
     ['Maquinas con patrón', summary.recurringMachines, 'Reincidencia o consumo repetido'],
     ['Preventivos vencidos', summary.overduePreventiveCount, 'Planes activos fuera de fecha'],
+    ['Recomendaciones', summary.recommendationCount, 'Acciones determinísticas sugeridas'],
     ['Costo estimado', formatCost(summary.maintenanceCost), 'Piezas consumidas en el periodo'],
   ];
   return (

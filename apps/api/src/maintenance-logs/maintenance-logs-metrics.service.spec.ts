@@ -45,6 +45,7 @@ describe('MaintenanceLogsMetricsService', () => {
       overduePreventiveCount: 1,
       maintenanceCost: 45,
       recurringMachines: 1,
+      recommendationCount: 1,
     });
     expect(result.machines[0]).toEqual(
       expect.objectContaining({

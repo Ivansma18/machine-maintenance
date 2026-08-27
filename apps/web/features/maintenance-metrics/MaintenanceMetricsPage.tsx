@@ -5,6 +5,7 @@ import { AppPanel } from '@/components/ui/AppPanel';
 import { AppShell } from '@/components/layout/AppShell';
 import { RecurrenceMetricCards } from './components/RecurrenceMetricCards';
 import { RecurrenceMachineTable } from './components/RecurrenceMachineTable';
+import { RecommendationList } from './components/RecommendationList';
 import { useRecurrenceMetrics } from './hooks/useRecurrenceMetrics';
 
 export function MaintenanceMetricsPage() {
@@ -49,6 +50,11 @@ export function MaintenanceMetricsPage() {
       ) : metrics.data ? (
         <div className="grid gap-6">
           <RecurrenceMetricCards summary={metrics.data.summary} />
+          <AppPanel title="Recomendaciones operativas" eyebrow="Reglas explicables">
+            <div className="p-5 pt-1">
+              <RecommendationList recommendations={metrics.data.recommendations} />
+            </div>
+          </AppPanel>
           <AppPanel title="Máquinas a observar" eyebrow="Ordenadas por fallas y costo">
             <RecurrenceMachineTable machines={metrics.data.machines} />
           </AppPanel>
