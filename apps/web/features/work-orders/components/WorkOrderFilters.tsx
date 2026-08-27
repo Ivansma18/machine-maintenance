@@ -11,7 +11,7 @@ export function WorkOrderFilters({
   onChange: (filters: Partial<WorkOrderFilters>) => void;
 }) {
   return (
-    <div className="grid gap-3 md:grid-cols-4">
+    <div className="grid p-5 gap-3 md:grid-cols-4">
       <AppSelect
         allowClear
         className="w-full"
