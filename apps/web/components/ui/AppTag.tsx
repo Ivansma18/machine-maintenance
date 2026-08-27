@@ -16,7 +16,7 @@ const toneColors: Record<AppTagTone, TagProps['color']> = {
 
 export function AppTag({ tone = 'neutral', children, ...props }: AppTagProps) {
   return (
-    <Tag bordered={false} color={toneColors[tone]} {...props}>
+    <Tag color={toneColors[tone]} variant="filled" {...props}>
       {children}
     </Tag>
   );

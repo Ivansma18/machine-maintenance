@@ -1,6 +1,0 @@
-{"timestamp":"00:00:01.370","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:00:06.551","source":"Server","level":"LOG","message":"○ Compiling / ..."}
-{"timestamp":"00:00:10.589","source":"Server","level":"ERROR","message":"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\"filled\"` instead."}
-{"timestamp":"00:00:11.312","source":"Browser","level":"INFO","message":"Download the React DevTools for a better development experience: https://react.dev/link/react-devtools"}
-{"timestamp":"00:00:12.064","source":"Browser","level":"ERROR","message":"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\"filled\"` instead. "}
-{"timestamp":"00:00:12.064","source":"Server","level":"ERROR","message":"[browser] \"Warning: [antd: Tag] `bordered={false}` is deprecated. Please use `variant=\\\"filled\\\"` instead.\" \"\""}

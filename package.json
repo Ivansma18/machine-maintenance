@@ -6,7 +6,23 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names API,WEB \"npm run start:api\" \"npm run dev:web\"",
     "dev:web": "npm run dev --workspace apps/web",
-    "build:web": "npm run build --workspace apps/web"
+    "build:web": "npm run build --workspace apps/web",
+    "build:api": "npm run build --workspace apps/api",
+    "start:api": "npm run start:dev --workspace apps/api",
+    "test:api": "npm run test --workspace apps/api",
+    "typecheck:api": "npm run typecheck --workspace apps/api",
+    "prisma:migrate:dev": "npm run prisma:migrate:dev --workspace apps/api",
+    "prisma:migrate:deploy": "npm run prisma:migrate:deploy --workspace apps/api",
+    "prisma:seed": "npm run prisma:seed --workspace apps/api",
+    "prisma:generate": "npm run prisma:generate --workspace apps/api",
+    "prisma:validate": "npm run prisma:validate --workspace apps/api",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "prettier": "^3.6.2"
   }
 }

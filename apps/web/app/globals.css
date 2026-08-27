@@ -26,8 +26,7 @@ body {
   min-width: 320px;
   margin: 0;
   background:
-    radial-gradient(circle at 80% -10%, rgba(242, 184, 75, 0.15), transparent 28rem),
-    var(--paper);
+    radial-gradient(circle at 80% -10%, rgba(242, 184, 75, 0.15), transparent 28rem), var(--paper);
   color: var(--ink);
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;

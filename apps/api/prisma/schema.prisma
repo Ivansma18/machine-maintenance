@@ -1,0 +1,424 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MachineStatus {
+  ACTIVE
+  INACTIVE
+  UNDER_MAINTENANCE
+  RETIRED
+}
+
+enum MachineCriticality {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+  INSPECTION
+}
+
+enum MaintenanceResult {
+  OK
+  NEEDS_FOLLOW_UP
+  FAILED
+  CRITICAL_FAILURE
+}
+
+enum PartUnit {
+  UNIT
+  SET
+  METER
+  LITER
+  KILOGRAM
+}
+
+enum WorkOrderType {
+  PREVENTIVE
+  CORRECTIVE
+  INSPECTION
+}
+
+enum WorkOrderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum WorkOrderStatus {
+  OPEN
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationType {
+  PREVENTIVE_DUE_SOON
+  PREVENTIVE_OVERDUE
+  URGENT_CRITICAL_FAILURE
+}
+
+enum NotificationSeverity {
+  INFO
+  WARNING
+  URGENT
+  CRITICAL
+}
+
+enum NotificationStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+}
+
+enum AuditActorType {
+  USER
+  SERVICE
+}
+
+model MachineCategory {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique @db.VarChar(100)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+  machines    Machine[]
+}
+
+model Machine {
+  id           String             @id @default(uuid()) @db.Uuid
+  categoryId   String             @db.Uuid
+  name         String             @db.VarChar(150)
+  serialNumber String?            @unique @db.VarChar(100)
+  location     String             @db.VarChar(150)
+  productionLineId String?        @db.Uuid
+  manufacturer String?            @db.VarChar(100)
+  model        String?            @db.VarChar(100)
+  status       MachineStatus      @default(ACTIVE)
+  criticality  MachineCriticality @default(MEDIUM)
+  installedAt  DateTime?          @db.Date
+  createdAt    DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime           @updatedAt @db.Timestamptz(3)
+
+  category         MachineCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  productionLine   ProductionLine?   @relation(fields: [productionLineId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  maintenancePlans MaintenancePlan[]
+  maintenanceLogs  MaintenanceLog[]
+  notifications    Notification[]
+  workOrders       WorkOrder[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([criticality])
+  @@index([location])
+  @@index([productionLineId])
+}
+
+model Site {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(150)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+  areas       Area[]
+  userScopes  UserScope[]
+  @@index([isActive])
+}
+
+model Area {
+  id        String   @id @default(uuid()) @db.Uuid
+  siteId    String   @db.Uuid
+  name      String   @db.VarChar(150)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  site      Site             @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  lines     ProductionLine[]
+  userScopes UserScope[]
+  @@unique([siteId, name])
+  @@index([siteId])
+}
+
+model ProductionLine {
+  id        String   @id @default(uuid()) @db.Uuid
+  areaId    String   @db.Uuid
+  name      String   @db.VarChar(150)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  area      Area      @relation(fields: [areaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  machines  Machine[]
+  @@unique([areaId, name])
+  @@index([areaId])
+}
+
+model MaintenancePlan {
+  id                String    @id @default(uuid()) @db.Uuid
+  machineId         String    @db.Uuid
+  name              String    @db.VarChar(150)
+  description       String?   @db.Text
+  frequencyDays     Int
+  warningDaysBefore Int       @default(7)
+  isActive          Boolean   @default(true)
+  startsAt          DateTime  @db.Date
+  lastComputedDueAt DateTime? @db.Date
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
+
+  machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenanceLogs MaintenanceLog[]
+  notifications   Notification[]
+  workOrders      WorkOrder[]
+
+  @@index([machineId])
+  @@index([isActive, lastComputedDueAt])
+  @@index([startsAt])
+}
+
+model MaintenanceLog {
+  id                String            @id @default(uuid()) @db.Uuid
+  machineId         String            @db.Uuid
+  maintenancePlanId String?           @db.Uuid
+  performedAt       DateTime          @db.Timestamptz(3)
+  type              MaintenanceType
+  result            MaintenanceResult
+  notes             String?           @db.Text
+  performedBy       String            @db.VarChar(150)
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @db.Timestamptz(3)
+
+  machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlan MaintenancePlan? @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  parts           MaintenanceLogPart[]
+
+  @@index([machineId, performedAt])
+  @@index([maintenancePlanId, performedAt])
+  @@index([type, result])
+}
+
+model Part {
+  id                     String   @id @default(uuid()) @db.Uuid
+  sku                    String   @unique @db.VarChar(100)
+  name                   String   @db.VarChar(180)
+  description            String?  @db.Text
+  unit                   PartUnit
+  manufacturer           String?  @db.VarChar(100)
+  manufacturerPartNumber String?  @db.VarChar(100)
+  isCritical             Boolean  @default(false)
+  isActive               Boolean  @default(true)
+  createdAt              DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime @updatedAt @db.Timestamptz(3)
+
+  inventory           InventoryItem?
+  maintenanceLogParts MaintenanceLogPart[]
+}
+
+model InventoryItem {
+  id              String   @id @default(uuid()) @db.Uuid
+  partId          String   @unique @db.Uuid
+  quantityOnHand  Float    @default(0)
+  minimumQuantity Float    @default(0)
+  reorderQuantity Float?
+  unitCost        Float?
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+
+  part Part @relation(fields: [partId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+}
+
+model MaintenanceLogPart {
+  id               String   @id @default(uuid()) @db.Uuid
+  maintenanceLogId String   @db.Uuid
+  partId           String   @db.Uuid
+  quantity         Float
+  unitCostSnapshot Float?
+  notes            String?  @db.Text
+  createdAt        DateTime @default(now()) @db.Timestamptz(3)
+
+  maintenanceLog MaintenanceLog @relation(fields: [maintenanceLogId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  part           Part           @relation(fields: [partId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([maintenanceLogId, partId])
+  @@index([partId, createdAt])
+}
+
+model Notification {
+  id                String               @id @default(uuid()) @db.Uuid
+  machineId         String               @db.Uuid
+  maintenancePlanId String?              @db.Uuid
+  type              NotificationType
+  severity          NotificationSeverity
+  status            NotificationStatus   @default(OPEN)
+  title             String               @db.VarChar(180)
+  message           String               @db.Text
+  dueAt             DateTime?            @db.Timestamptz(3)
+  resolvedAt        DateTime?            @db.Timestamptz(3)
+  createdAt         DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime             @updatedAt @db.Timestamptz(3)
+
+  machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlan MaintenancePlan? @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([machineId, status])
+  @@index([maintenancePlanId, type, status])
+  @@index([status, severity])
+  @@index([dueAt])
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique @db.VarChar(100)
+  email        String   @unique @db.VarChar(255)
+  name         String   @db.VarChar(150)
+  passwordHash String   @db.VarChar(255)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  roles              UserRole[]
+  scopes             UserScope[]
+  sessions           Session[]
+  assignedWorkOrders WorkOrder[] @relation("WorkOrderAssignee")
+  createdWorkOrders  WorkOrder[] @relation("WorkOrderCreator")
+}
+
+enum ScopeLevel {
+  SITE
+  AREA
+}
+
+model UserScope {
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @db.Uuid
+  level     ScopeLevel
+  siteId    String?    @db.Uuid
+  areaId    String?    @db.Uuid
+  createdAt DateTime   @default(now()) @db.Timestamptz(3)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  site      Site?      @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  area      Area?      @relation(fields: [areaId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@unique([userId, level, siteId, areaId])
+  @@index([userId])
+  @@index([siteId])
+  @@index([areaId])
+}
+
+model WorkOrder {
+  id                 String            @id @default(uuid()) @db.Uuid
+  machineId          String            @db.Uuid
+  maintenancePlanId  String?           @db.Uuid
+  title              String            @db.VarChar(180)
+  description        String?           @db.Text
+  type               WorkOrderType
+  priority           WorkOrderPriority @default(MEDIUM)
+  status             WorkOrderStatus   @default(OPEN)
+  scheduledAt        DateTime?         @db.Timestamptz(3)
+  dueAt              DateTime?         @db.Timestamptz(3)
+  assignedToUserId   String?           @db.Uuid
+  completedAt        DateTime?         @db.Timestamptz(3)
+  cancelledAt        DateTime?         @db.Timestamptz(3)
+  cancellationReason String?           @db.Text
+  createdByUserId    String            @db.Uuid
+  createdAt          DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime          @updatedAt @db.Timestamptz(3)
+
+  machine         Machine          @relation(fields: [machineId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  maintenancePlan MaintenancePlan? @relation(fields: [maintenancePlanId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  assignedTo      User?            @relation("WorkOrderAssignee", fields: [assignedToUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdBy       User             @relation("WorkOrderCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([machineId, status])
+  @@index([maintenancePlanId])
+  @@index([assignedToUserId, status])
+  @@index([status, dueAt])
+  @@index([priority, status])
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(100)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique @db.VarChar(150)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  roles RolePermission[]
+}
+
+model UserRole {
+  userId String @db.Uuid
+  roleId String @db.Uuid
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       String @db.Uuid
+  permissionId String @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model Session {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique @db.VarChar(128)
+  lastSeenAt DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt  DateTime  @db.Timestamptz(3)
+  revokedAt  DateTime? @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, revokedAt])
+}
+
+model AuditEvent {
+  id         String         @id @default(uuid()) @db.Uuid
+  actorType  AuditActorType
+  actorId    String         @db.VarChar(150)
+  action     String         @db.VarChar(100)
+  entityType String         @db.VarChar(100)
+  entityId   String?        @db.VarChar(150)
+  before     Json?
+  after      Json?
+  reason     String?        @db.Text
+  requestId  String?        @db.VarChar(100)
+  createdAt  DateTime       @default(now()) @db.Timestamptz(3)
+
+  @@index([actorType, actorId])
+  @@index([entityType, entityId])
+  @@index([action, createdAt])
+  @@index([createdAt])
+}
