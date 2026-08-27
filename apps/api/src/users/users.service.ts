@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 const userInclude = {
   roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } },
+  scopes: true,
 } satisfies Prisma.UserInclude;
 
 function deriveKey(password: string, salt: string) {
@@ -147,6 +148,51 @@ export class UsersService {
     return { temporaryPassword };
   }
 
+  async assignScopes(
+    id: string,
+    scopes: { level: 'SITE' | 'AREA'; siteId?: string; areaId?: string }[],
+    context: AuditContext,
+  ) {
+    const user = await this.prisma.user.findUnique({ where: { id }, select: { id: true } });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+    for (const scope of scopes) {
+      if (scope.level === 'SITE' && !scope.siteId)
+        throw new BadRequestException('Site scopes require siteId');
+      if (scope.level === 'AREA' && !scope.areaId)
+        throw new BadRequestException('Area scopes require areaId');
+      if (
+        scope.level === 'SITE' &&
+        !(await this.prisma.site.findUnique({ where: { id: scope.siteId }, select: { id: true } }))
+      )
+        throw new BadRequestException('Site scope does not exist');
+      if (
+        scope.level === 'AREA' &&
+        !(await this.prisma.area.findUnique({ where: { id: scope.areaId }, select: { id: true } }))
+      )
+        throw new BadRequestException('Area scope does not exist');
+    }
+    await this.prisma.$transaction(async (tx) => {
+      await tx.userScope.deleteMany({ where: { userId: id } });
+      if (scopes.length)
+        await tx.userScope.createMany({
+          data: scopes.map((scope) => ({
+            userId: id,
+            level: scope.level,
+            siteId: scope.siteId,
+            areaId: scope.areaId,
+          })),
+        });
+    });
+    await this.audit.record({
+      ...context,
+      action: 'user.scopes.updated',
+      entityType: 'User',
+      entityId: id,
+      after: { scopes },
+    });
+    return { scopes };
+  }
+
   private async ensureRoles(roleIds: string[]) {
     const count = await this.prisma.role.count({ where: { id: { in: roleIds } } });
     if (count !== roleIds.length) throw new BadRequestException('One or more roles do not exist');
@@ -183,6 +229,7 @@ export class UsersService {
           ),
         ),
       ],
+      scopes: user.scopes,
     };
   }
 }

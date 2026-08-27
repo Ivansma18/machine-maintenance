@@ -9,4 +9,5 @@ export type AuthIdentity = {
   user: AuthenticatedUser;
   roles: string[];
   permissions: string[];
+  scopes: { level: 'SITE' | 'AREA'; siteId: string | null; areaId: string | null }[];
 };

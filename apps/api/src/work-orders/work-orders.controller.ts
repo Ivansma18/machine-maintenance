@@ -32,8 +32,8 @@ export class WorkOrdersController {
 
   @Get()
   @RequirePermission('work-orders:read')
-  findAll(@Query() query: ListWorkOrdersDto) {
-    return this.workOrdersService.findAll(query);
+  findAll(@Query() query: ListWorkOrdersDto, @Req() request: AuthenticatedRequest) {
+    return this.workOrdersService.findAll(query, request.identity);
   }
 
   @Get(':id')

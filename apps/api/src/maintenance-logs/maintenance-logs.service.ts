@@ -11,6 +11,8 @@ import { AuditService } from '../audit/audit.service';
 import type { AuditContext } from '../audit/audit.types';
 import { CreateMaintenanceLogDto } from './dto/create-maintenance-log.dto';
 import { ListMaintenanceLogsDto } from './dto/list-maintenance-logs.dto';
+import type { AuthenticatedIdentity } from '../auth/types/auth.types';
+import { machineScopeWhere } from '../authorization/scope-filter';
 
 const logInclude = {
   machine: { include: { category: true } },
@@ -122,7 +124,7 @@ export class MaintenanceLogsService {
     return result;
   }
 
-  async findAll(query: ListMaintenanceLogsDto) {
+  async findAll(query: ListMaintenanceLogsDto, identity?: AuthenticatedIdentity) {
     const where: Prisma.MaintenanceLogWhereInput = {
       machineId: query.machineId,
       maintenancePlanId: query.maintenancePlanId,
@@ -133,6 +135,7 @@ export class MaintenanceLogsService {
         lte: query.performedTo ? this.toEndOfDay(query.performedTo) : undefined,
       },
     };
+    if (identity) where.machine = machineScopeWhere(identity);
     const skip = (query.page - 1) * query.limit;
 
     const [data, total] = await this.prisma.$transaction([

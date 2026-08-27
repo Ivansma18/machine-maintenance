@@ -9,6 +9,7 @@ export type AuthenticatedIdentity = {
   user: AuthenticatedUser;
   roles: string[];
   permissions: string[];
+  scopes: { level: 'SITE' | 'AREA'; siteId: string | null; areaId: string | null }[];
   sessionId: string;
 };
 

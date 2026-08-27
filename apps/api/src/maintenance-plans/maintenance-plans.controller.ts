@@ -29,8 +29,8 @@ export class MaintenancePlansController {
 
   @Get()
   @RequirePermission('maintenance-plans:read')
-  findAll(@Query() query: ListMaintenancePlansDto) {
-    return this.maintenancePlansService.findAll(query);
+  findAll(@Query() query: ListMaintenancePlansDto, @Req() request: AuthenticatedRequest) {
+    return this.maintenancePlansService.findAll(query, request.identity);
   }
 
   @Patch(':id/activate')

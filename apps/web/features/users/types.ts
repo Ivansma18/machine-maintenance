@@ -13,7 +13,9 @@ export type ManagedUser = {
   createdAt: string;
   roles: UserRole[];
   permissions: string[];
+  scopes: UserScope[];
 };
+export type UserScope = { level: 'SITE' | 'AREA'; siteId: string | null; areaId: string | null };
 export type CreateUserValues = {
   username: string;
   email: string;

@@ -7,12 +7,14 @@ export function UserList({
   loading,
   onToggle,
   onRoles,
+  onScopes,
   onReset,
 }: {
   users: ManagedUser[];
   loading: boolean;
   onToggle: (user: ManagedUser) => void;
   onRoles: (user: ManagedUser) => void;
+  onScopes: (user: ManagedUser) => void;
   onReset: (user: ManagedUser) => void;
 }) {
   return (
@@ -36,12 +38,16 @@ export function UserList({
                 </p>
                 <p className="m-0 mt-2 text-xs font-semibold text-[#495852]">
                   Roles: {user.roles.map((role) => role.name).join(', ') || 'Sin roles'} ·{' '}
-                  {user.permissions.length} permisos efectivos
+                  {user.permissions.length} permisos efectivos · Alcances:{' '}
+                  {user.scopes.length || 'Global'}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <AppButton variant="secondary" onClick={() => onRoles(user)}>
                   Asignar roles
+                </AppButton>
+                <AppButton variant="secondary" onClick={() => onScopes(user)}>
+                  Asignar alcance
                 </AppButton>
                 <AppButton variant="secondary" onClick={() => onReset(user)}>
                   Reset password

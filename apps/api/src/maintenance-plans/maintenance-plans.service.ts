@@ -10,6 +10,8 @@ import { AuditService } from '../audit/audit.service';
 import type { AuditContext } from '../audit/audit.types';
 import { CreateMaintenancePlanDto } from './dto/create-maintenance-plan.dto';
 import { ListMaintenancePlansDto } from './dto/list-maintenance-plans.dto';
+import type { AuthenticatedIdentity } from '../auth/types/auth.types';
+import { machineScopeWhere } from '../authorization/scope-filter';
 import { UpdateMaintenancePlanDto } from './dto/update-maintenance-plan.dto';
 import { calculatePlanSchedule, VALID_PREVENTIVE_RESULTS } from './maintenance-plan-dates';
 
@@ -81,11 +83,12 @@ export class MaintenancePlansService {
     return result;
   }
 
-  async findAll(query: ListMaintenancePlansDto) {
+  async findAll(query: ListMaintenancePlansDto, identity?: AuthenticatedIdentity) {
     const where: Prisma.MaintenancePlanWhereInput = {
       machineId: query.machineId,
       isActive: query.isActive,
     };
+    if (identity) where.machine = machineScopeWhere(identity);
     const skip = (query.page - 1) * query.limit;
 
     const [plans, total] = await this.prisma.$transaction([
