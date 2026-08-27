@@ -49,6 +49,7 @@ const permissionDefinitions = [
   { key: 'inventory:adjust', description: 'Adjust inventory quantities.' },
   { key: 'maintenance-logs:parts', description: 'Record parts consumed by maintenance logs.' },
   { key: 'audit:read', description: 'View audit events.' },
+  { key: 'users:manage', description: 'Manage users, roles, and access.' },
 ] as const;
 
 const roleDefinitions = [

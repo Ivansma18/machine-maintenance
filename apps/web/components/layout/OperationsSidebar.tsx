@@ -8,6 +8,7 @@ const navigation = [
   { href: '/maintenance-calendar', label: 'Agenda' },
   { href: '/maintenance-metrics', label: 'Reincidencia' },
   { href: '/audit', label: 'Auditoría' },
+  { href: '/users', label: 'Usuarios' },
   { href: '/maintenance-logs', label: 'Historial' },
   { href: '/notifications', label: 'Alertas' },
 ];
