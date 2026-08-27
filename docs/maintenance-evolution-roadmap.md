@@ -309,6 +309,9 @@ La misma pieza fue reemplazada 4 veces este ano. Revisar causa raiz.
 
 La primera version debe ser deterministica y basada en datos existentes, no depender de inteligencia artificial.
 
+**Estado:** implementada junto con las metricas de reincidencia. Las recomendaciones muestran una
+regla, severidad, evidencia y siguiente paso para cada maquina detectada.
+
 ## Bloque 7: Administracion Avanzada
 
 ### Fase 37: Consulta De Auditoria
@@ -400,5 +403,4 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 36: generar recomendaciones operativas explicables
-mediante reglas.
+El siguiente incremento recomendado es la Fase 37: permitir la consulta de eventos auditados.

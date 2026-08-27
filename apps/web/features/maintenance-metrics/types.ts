@@ -21,6 +21,18 @@ export type RecurrenceMetrics = {
     overduePreventiveCount: number;
     maintenanceCost: number;
     recurringMachines: number;
+    recommendationCount: number;
   };
   machines: RecurrenceMachine[];
+  recommendations: MaintenanceRecommendation[];
+};
+
+export type MaintenanceRecommendation = {
+  id: string;
+  machineId: string;
+  machineName: string;
+  severity: 'URGENT' | 'HIGH' | 'MEDIUM';
+  title: string;
+  reason: string;
+  action: string;
 };
