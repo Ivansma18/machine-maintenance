@@ -345,6 +345,9 @@ accion, entidad, request y fecha.
 
 Todas las acciones deben auditarse y mantenerse protegidas para `Admin`.
 
+**Estado:** implementada en `/users`, protegida por `users:manage`, con alta de usuarios, activacion
+y desactivacion, asignacion de roles, permisos efectivos y reset de password temporal.
+
 ## Bloque 8: Multi-Planta Y Escalabilidad
 
 ### Fase 39: Plantas, Areas Y Lineas
@@ -406,4 +409,4 @@ La secuencia recomendada es:
 
 ## Siguiente Paso
 
-El siguiente incremento recomendado es la Fase 38: administrar usuarios y roles desde la aplicacion.
+El siguiente incremento recomendado es la Fase 39: modelar plantas, areas y lineas operativas.

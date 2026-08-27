@@ -14,6 +14,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { WorkOrdersModule } from './work-orders/work-orders.module';
 import { PartsModule } from './parts/parts.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PartsModule } from './parts/parts.module';
     NotificationsModule,
     WorkOrdersModule,
     PartsModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
